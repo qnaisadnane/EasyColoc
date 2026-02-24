@@ -47,6 +47,16 @@
             @endif
         </div>
 
+        <div>
+            <x-input-label for="role" :value="__('Role')" />
+            <x-text-input id="role" name="role" type="text" class="mt-1 block w-full bg-gray-100" :value="$user->role" disabled />
+        </div>
+
+        <div>
+            <x-input-label for="is_banned" :value="__('Status')" />
+            <x-text-input id="is_banned" name="is_banned" type="text" class="mt-1 block w-full bg-gray-100" :value="$user->is_banned ? __('Banned') : __('Active')" disabled />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

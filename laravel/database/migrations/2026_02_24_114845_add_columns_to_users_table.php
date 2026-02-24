@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role' ,['member','owner','admin']);
-            $table->boolean('isBanned')->default(false);
+            $table->enum('role' ,['member','owner','admin'])->default('member');
+            $table->boolean('is_banned')->default(false);
         });
     }
 
