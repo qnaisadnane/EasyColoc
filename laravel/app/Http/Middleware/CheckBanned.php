@@ -15,13 +15,13 @@ class CheckBanned
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(auth()->check() && $auth->user()->is_banned){
+        if(auth()->check() && auth()->user()->is_banned){
             auth()->logout();
 
             $request->session()->invalidate();
-            $request->session()->generateToken();
+            $request->session()->regenerateToken();
 
-            return redirect()->route('login')->with('error', 'The error was been banned');
+            return redirect()->route('login')->withErrors(['email' => 'Your account has been banned.']);
 
         }
         return $next($request);
