@@ -30,9 +30,7 @@ class ColocationController extends Controller
         return view('colocations.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         if (auth()->user()->activeColocation()) {
@@ -53,9 +51,7 @@ class ColocationController extends Controller
         return redirect()->route('colocations.show', $colocation)->with('success', 'Colocation créée avec succès !');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(Colocation $colocation)
     {
         // Vérifier si l'utilisateur est membre (actuel ou passé)
@@ -72,9 +68,7 @@ class ColocationController extends Controller
         return view('colocations.show', compact('colocation'));
     }
 
-    /**
-     * Leave the colocation.
-     */
+    
     public function leave(Colocation $colocation)
     {
         $user = auth()->user();
