@@ -48,4 +48,19 @@ class User extends Authenticatable
             'is_banned' => 'boolean',
         ];
     }
+
+    public function colocations()
+    {
+        return $this->belongsToMany(Colocation::class)
+            ->withPivot('role', 'left_at')
+            ->withTimestamps();
+    }
+
+    public function activeColocation()
+    {
+        return $this->colocations()
+            ->whereNull('colocation_user.left_at')
+            ->where('colocations.status', 'active')
+            ->first();
+    }
 }

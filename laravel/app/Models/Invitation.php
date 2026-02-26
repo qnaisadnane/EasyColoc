@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Invitation extends Model
 {
-    $fillable = ['','','']
+    protected $fillable = ['email', 'token', 'colocation_id', 'status'];
+
+    public function colocation()
+    {
+        return $this->belongsTo(Colocation::class);
+    }
 }

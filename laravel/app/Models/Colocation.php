@@ -6,9 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Colocation extends Model
 {
-    $table = 
-    $primarykey = 'id';
-    $fillable = ['',''];
+    protected $fillable = ['name', 'status'];
 
-    public function 
+    public function members()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('role', 'left_at')
+            ->withTimestamps();
+    }
+
+    public function owner()
+    {
+        return $this->members()->wherePivot('role', 'owner');
+    }
+
+    public function invitations()
+    {
+        return $this->hasMany(Invitation::class);
+    }
 }

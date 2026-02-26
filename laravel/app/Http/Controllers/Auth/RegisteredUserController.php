@@ -49,6 +49,16 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        if (session()->has('invitation_token')) {
+            $invitation = \App\Models\Invitation::where('token', session('invitation_token'))->where('status', 'pending')->first();
+            if ($invitation && $invitation->email === $user->email) {
+                $invitation->colocation->members()->attach($user->id, ['role' => 'member']);
+                $invitation->update(['status' => 'accepted']);
+                session()->forget('invitation_token');
+                return redirect()->route('colocations.show', $invitation->colocation)->with('success', 'Bienvenue dans votre nouvelle colocation !');
+            }
+        }
+
         return redirect(route('dashboard', absolute: false));
     }
 }
