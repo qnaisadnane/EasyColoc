@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Categorie extends Model
+class Category extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'icon', 'color'];
 
-     public function expenses()
+    public function expenses()
     {
         return $this->hasMany(Expense::class);
-    } 
+    }
 }

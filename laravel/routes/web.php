@@ -20,6 +20,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('colocations', \App\Http\Controllers\ColocationController::class);
     Route::post('/colocations/{colocation}/invite', [\App\Http\Controllers\InvitationController::class, 'store'])->name('invitations.store');
     Route::get('/invitations/{token}', [\App\Http\Controllers\InvitationController::class, 'accept'])->name('invitations.accept');
+    
+    // Dépenses
+    Route::post('/colocations/{colocation}/expenses', [\App\Http\Controllers\DepenseController::class, 'store'])->name('depenses.store');
+    Route::patch('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'update'])->name('depenses.update');
+    Route::delete('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'destroy'])->name('depenses.destroy');
 });
 
 require __DIR__.'/auth.php';

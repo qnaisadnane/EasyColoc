@@ -63,4 +63,9 @@ class User extends Authenticatable
             ->where('colocations.status', 'active')
             ->first();
     }
+
+    public function paidExpenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
 }

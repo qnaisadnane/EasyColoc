@@ -52,20 +52,46 @@ class ColocationController extends Controller
     }
 
     
-    public function show(Colocation $colocation)
+    public function show(Request $request, Colocation $colocation)
     {
-        // Vérifier si l'utilisateur est membre (actuel ou passé)
+        // Vérifier si l'utilisateur est membre actif
         $membership = $colocation->members()->where('user_id', auth()->id())->whereNull('left_at')->first();
         
         if (!$membership) {
             abort(403);
         }
 
+        // Filtres de mois et année
+        $month = $request->get('month', date('m'));
+        $year = $request->get('year', date('Y'));
+
+        // Récupérer les dépenses filtrées
+        $expenses = $colocation->expenses()
+            ->with(['payer', 'category'])
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->orderBy('date', 'desc')
+            ->get();
+
+        // Calculer les statistiques par catégorie
+        $stats = $expenses->groupBy('category_id')->map(function ($group) {
+            return [
+                'name' => $group->first()->category->name,
+                'total' => $group->sum('amount'),
+                'color' => $group->first()->category->color,
+                'icon' => $group->first()->category->icon,
+            ];
+        });
+
+        $totalMonthly = $expenses->sum('amount');
+
         $colocation->load(['members' => function($query) {
             $query->whereNull('left_at');
         }]);
         
-        return view('colocations.show', compact('colocation'));
+        $categories = \App\Models\Category::all();
+
+        return view('colocations.show', compact('colocation', 'expenses', 'stats', 'totalMonthly', 'month', 'year', 'categories'));
     }
 
     
