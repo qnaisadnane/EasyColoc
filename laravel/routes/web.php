@@ -26,6 +26,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/colocations/{colocation}/expenses', [\App\Http\Controllers\DepenseController::class, 'store'])->name('depenses.store');
     Route::patch('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'update'])->name('depenses.update');
     Route::delete('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'destroy'])->name('depenses.destroy');
+
+    // Tâches & Courses
+    Route::post('/colocations/{colocation}/tasks', [\App\Http\Controllers\TaskController::class, 'store'])->name('tasks.store');
+    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\TaskController::class, 'complete'])->name('tasks.complete');
+    Route::delete('/tasks/{task}', [\App\Http\Controllers\TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    Route::post('/colocations/{colocation}/shopping', [\App\Http\Controllers\ShoppingController::class, 'store'])->name('shopping.store');
+    Route::post('/shopping/{item}/toggle', [\App\Http\Controllers\ShoppingController::class, 'toggle'])->name('shopping.toggle');
+    Route::delete('/shopping/{item}', [\App\Http\Controllers\ShoppingController::class, 'destroy'])->name('shopping.destroy');
 });
 
 require __DIR__.'/auth.php';

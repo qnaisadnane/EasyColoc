@@ -57,7 +57,7 @@
         </div>
     </x-slot>
 
-    <div class="py-12" x-data="{ openExpenseModal: false }">
+    <div class="py-12" x-data="{ openExpenseModal: false, openTaskModal: false, openShoppingModal: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 <!-- Flux de Dépenses -->
@@ -122,59 +122,127 @@
                     </div>
                 </div>
 
-                <!-- Statistiques Crystal -->
+                <!-- Règlements (Balances) -->
                 <div class="lg:col-span-4 space-y-10">
-                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5 bg-gradient-to-br from-indigo-600/10 to-transparent">
-                        <div class="flex items-center justify-between mb-8">
-                            <h3 class="text-xl font-black text-white tracking-tight">Analyse du Mois</h3>
-                            <div class="px-3 py-1 rounded-full bg-indigo-500/20 text-[9px] font-black text-indigo-300 uppercase tracking-widest border border-indigo-500/30">
-                                {{ Carbon\Carbon::create()->month((int) $month)->translatedFormat('F') }}
-                            </div>
-                        </div>
-
-                        <div class="mb-10">
-                            <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Total injecté</p>
-                            <p class="text-5xl font-black text-white tracking-tighter">{{ number_format($totalMonthly, 2) }}€</p>
-                        </div>
+                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5 bg-gradient-to-br from-fuchsia-600/10 to-transparent relative overflow-hidden">
+                        <div class="absolute -top-12 -left-12 h-32 w-32 bg-fuchsia-500/10 rounded-full blur-3xl"></div>
+                        <h3 class="text-xl font-black text-white tracking-tight mb-8 relative z-10">Règlements théorique</h3>
                         
-                        <div class="space-y-6">
-                            @forelse($stats as $stat)
-                                <div>
-                                    <div class="flex justify-between items-center mb-2">
-                                        <span class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center">
-                                            <span class="h-2 w-2 rounded-full bg-{{ $stat['color'] }}-500 mr-2 shadow-[0_0_8px_rgba(var(--tw-color-{{ $stat['color'] }}-500),0.5)]"></span>
-                                            {{ $stat['name'] }}
-                                        </span>
-                                        <span class="text-sm font-black text-white">{{ number_format($stat['total'], 2) }}€</span>
+                        <div class="space-y-6 relative z-10">
+                            @foreach($balances as $balance)
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="h-10 w-10 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center text-xs font-black text-white">
+                                            {{ substr($balance['user']->name, 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-black text-white uppercase">{{ $balance['user']->name }}</p>
+                                            <p class="text-[9px] font-bold text-slate-500">Payé: {{ number_format($balance['paid'], 2) }}€</p>
+                                        </div>
                                     </div>
-                                    <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                        <div class="h-full bg-{{ $stat['color'] }}-500 rounded-full shadow-[0_0_10px_rgba(var(--tw-color-{{ $stat['color'] }}-500),0.3)]" style="width: {{ $totalMonthly > 0 ? ($stat['total'] / $totalMonthly) * 100 : 0 }}%"></div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-black {{ $balance['balance'] >= 0 ? 'text-emerald-400' : 'text-rose-400' }}">
+                                            {{ $balance['balance'] >= 0 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}€
+                                        </p>
+                                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                            {{ $balance['balance'] >= 0 ? 'À RECEVOIR' : 'À PAYER' }}
+                                        </p>
                                     </div>
                                 </div>
+                            @endforeach
+                        </div>
+                        
+                        <div class="mt-8 pt-8 border-t border-white/5">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center italic">Calculé sur la base de {{ number_format($fairShare, 2) }}€ / personne</p>
+                        </div>
+                    </div>
+
+                    <!-- Planning des Tâches -->
+                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5 relative overflow-hidden group">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-xl font-black text-white tracking-tight">Planning</h3>
+                            <button @click="openTaskModal = true" class="text-indigo-400 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            @forelse($tasks as $task)
+                                <div class="p-5 rounded-3xl bg-white/[0.03] border border-white/5 group/task flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-white font-black text-sm uppercase tracking-tight">{{ $task->name }}</p>
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                                Assigné à : {{ $task->user->name ?? 'Tous' }} • {{ $task->frequency }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <form action="{{ route('tasks.complete', $task) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="h-8 w-8 rounded-full bg-white/5 hover:bg-emerald-500/20 text-slate-500 hover:text-emerald-400 border border-white/10 transition-all flex items-center justify-center shadow-lg">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                        </button>
+                                    </form>
+                                </div>
                             @empty
-                                <p class="text-slate-600 text-[10px] font-black uppercase tracking-widest text-center py-10 italic">Aucune donnée disponible</p>
+                                <p class="text-center text-slate-600 text-[10px] font-black uppercase tracking-widest py-4 italic">Aucune corvée prévue</p>
                             @endforelse
                         </div>
                     </div>
 
-                    <!-- Escouade -->
-                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5">
-                        <div class="flex items-center justify-between mb-10">
-                            <h3 class="text-2xl font-black text-white tracking-tight">Escouade</h3>
+                    <!-- Liste de Courses -->
+                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5 relative overflow-hidden">
+                         <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-xl font-black text-white tracking-tight">Liste de courses</h3>
+                            <button @click="openShoppingModal = true" class="text-fuchsia-400 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                            </button>
                         </div>
-                        
-                        <div class="space-y-8">
-                            @foreach($colocation->members as $member)
-                                <div class="group flex justify-between items-center">
-                                    <div class="flex items-center">
-                                        <div class="h-12 w-12 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-indigo-400 font-black shadow-inner">
-                                            {{ substr($member->name, 0, 1) }}
-                                        </div>
-                                        <div class="ml-4">
-                                            <p class="text-white font-black text-sm">{{ $member->name }}</p>
-                                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">{{ $member->pivot->role }}</p>
+
+                        <div class="space-y-3">
+                            @forelse($shoppingItems as $item)
+                                <div class="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group/shop">
+                                    <div class="flex items-center space-x-3">
+                                        <form action="{{ route('shopping.toggle', $item) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="h-5 w-5 rounded-md border border-fuchsia-500/30 flex items-center justify-center bg-fuchsia-500/5 hover:bg-fuchsia-500/20 transition-all">
+                                                <div class="h-2 w-2 rounded-sm bg-fuchsia-500 opacity-0 group-hover/shop:opacity-30"></div>
+                                            </button>
+                                        </form>
+                                        <div>
+                                            <p class="text-slate-200 font-bold text-xs uppercase tracking-tight">{{ $item->name }}</p>
+                                            @if($item->quantity)
+                                                <p class="text-[9px] font-bold text-slate-600 uppercase">{{ $item->quantity }}</p>
+                                            @endif
                                         </div>
                                     </div>
+                                    <form action="{{ route('shopping.destroy', $item) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-slate-700 hover:text-rose-500 transition-colors opacity-0 group-hover/shop:opacity-100">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            @empty
+                                <p class="text-center text-slate-600 text-[10px] font-black uppercase tracking-widest py-4 italic">Le frigo est plein !</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Escouade (Compact) -->
+                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5">
+                        <h3 class="text-xl font-black text-white tracking-tight mb-8">Escouade</h3>
+                        <div class="flex flex-wrap gap-4">
+                            @foreach($colocation->members as $member)
+                                <div class="relative group" title="{{ $member->name }}">
+                                    <div class="h-12 w-12 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-indigo-400 font-black shadow-inner group-hover:border-indigo-500/50 transition-all">
+                                        {{ substr($member->name, 0, 1) }}
+                                    </div>
+                                    <div class="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-slate-950 {{ $member->pivot->role === 'owner' ? 'bg-amber-400' : 'bg-indigo-500' }}"></div>
                                 </div>
                             @endforeach
                         </div>
@@ -183,54 +251,56 @@
             </div>
         </div>
 
-        <!-- Modal Nouvelle Dépense -->
-        <div x-show="openExpenseModal" 
-             class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 scale-95"
-             x-transition:enter-end="opacity-100 scale-100"
-             x-cloak>
+        <!-- Modals -->
+        <!-- Modal Dépense (Déjà là) -->
+        <div x-show="openExpenseModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" x-cloak>
             <div xl-glass class="w-full max-w-lg p-10 rounded-[3rem] border border-white/10 shadow-2xl relative" @click.away="openExpenseModal = false">
-                <button @click="openExpenseModal = false" class="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-
-                <h3 class="text-3xl font-black text-white tracking-tighter mb-8">Nouvelle Dépense</h3>
-
+                <button @click="openExpenseModal = false" class="absolute top-8 right-8 text-slate-500 hover:text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h3 class="text-3xl font-black text-white tracking-tighter mb-8 uppercase">Nouvelle Dépense</h3>
                 <form action="{{ route('depenses.store', $colocation) }}" method="POST" class="space-y-6">
                     @csrf
-                    <div>
-                        <x-input-label for="description" :value="__('DESCRIPTION')" class="text-[10px] font-black tracking-[0.2em] text-slate-500 mb-2 ml-1" />
-                        <x-text-input id="description" name="description" type="text" class="block w-full" placeholder="Ex: Courses Monoprix" required />
-                    </div>
-
+                    <div><x-input-label for="description" :value="__('DESCRIPTION')" /><x-text-input id="description" name="description" type="text" class="block w-full" required /></div>
                     <div class="grid grid-cols-2 gap-6">
-                        <div>
-                            <x-input-label for="amount" :value="__('MONTANT (€)')" class="text-[10px] font-black tracking-[0.2em] text-slate-500 mb-2 ml-1" />
-                            <x-text-input id="amount" name="amount" type="number" step="0.01" class="block w-full" placeholder="0.00" required />
-                        </div>
-                        <div>
-                            <x-input-label for="date" :value="__('DATE')" class="text-[10px] font-black tracking-[0.2em] text-slate-500 mb-2 ml-1" />
-                            <x-text-input id="date" name="date" type="date" class="block w-full" value="{{ date('Y-m-d') }}" required />
-                        </div>
+                        <div><x-input-label for="amount" :value="__('MONTANT (€)')" /><x-text-input id="amount" name="amount" type="number" step="0.01" class="block w-full" required /></div>
+                        <div><x-input-label for="date" :value="__('DATE')" /><x-text-input id="date" name="date" type="date" class="block w-full" value="{{ date('Y-m-d') }}" required /></div>
                     </div>
-
-                    <div>
-                        <x-input-label for="category_id" :value="__('CATÉGORIE')" class="text-[10px] font-black tracking-[0.2em] text-slate-500 mb-2 ml-1" />
-                        <select name="category_id" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold focus:border-indigo-500/30 focus:ring-0 transition-all">
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="pt-4">
-                        <x-primary-button class="w-full py-4 uppercase tracking-widest font-black">
-                            ENREGISTRER LA DÉPENSE
-                        </x-primary-button>
-                    </div>
+                    <div><x-input-label for="category_id" :value="__('CATÉGORIE')" /><select name="category_id" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold">@foreach($categories as $category)<option value="{{ $category->id }}">{{ $category->name }}</option>@endforeach</select></div>
+                    <div class="pt-4"><x-primary-button class="w-full py-4 uppercase font-black">ENREGISTRER</x-primary-button></div>
                 </form>
             </div>
         </div>
+
+        <!-- Modal Tâche -->
+        <div x-show="openTaskModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" x-cloak>
+            <div xl-glass class="w-full max-w-lg p-10 rounded-[3rem] border border-white/10 shadow-2xl relative" @click.away="openTaskModal = false">
+                <button @click="openTaskModal = false" class="absolute top-8 right-8 text-slate-500 hover:text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h3 class="text-3xl font-black text-white tracking-tighter mb-8 uppercase">Nouvelle Corvée</h3>
+                <form action="{{ route('tasks.store', $colocation) }}" method="POST" class="space-y-6">
+                    @csrf
+                    <div><x-input-label for="name" :value="__('NOM DE LA TÂCHE')" /><x-text-input id="name" name="name" type="text" class="block w-full" placeholder="Ex: Sortir les poubelles" required /></div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div><x-input-label for="frequency" :value="__('FRÉQUENCE')" /><select name="frequency" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold"><option value="daily">Quotidien</option><option value="weekly">Hebdo</option><option value="monthly">Mensuel</option></select></div>
+                        <div><x-input-label for="points" :value="__('POINTS')" /><x-text-input id="points" name="points" type="number" class="block w-full" value="10" required /></div>
+                    </div>
+                    <div><x-input-label for="user_id" :value="__('ASSIGNÉ À (OPTIONNEL)')" /><select name="user_id" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold"><option value="">Tous les membres</option>@foreach($colocation->members as $member)<option value="{{ $member->id }}">{{ $member->name }}</option>@endforeach</select></div>
+                    <div class="pt-4"><x-primary-button class="w-full py-4 uppercase font-black tracking-widest">PLANIFIER</x-primary-button></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Liste de Courses -->
+        <div x-show="openShoppingModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" x-cloak>
+            <div xl-glass class="w-full max-w-lg p-10 rounded-[3rem] border border-white/10 shadow-2xl relative" @click.away="openShoppingModal = false">
+                <button @click="openShoppingModal = false" class="absolute top-8 right-8 text-slate-500 hover:text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                <h3 class="text-3xl font-black text-white tracking-tighter mb-8 uppercase">Ajouter aux courses</h3>
+                <form action="{{ route('shopping.store', $colocation) }}" method="POST" class="space-y-6">
+                    @csrf
+                    <div><x-input-label for="name" :value="__('PRODUIT')" /><x-text-input id="name" name="name" type="text" class="block w-full" placeholder="Ex: Lait d'avoine" required /></div>
+                    <div><x-input-label for="quantity" :value="__('QUANTITÉ / NOTE')" /><x-text-input id="quantity" name="quantity" type="text" class="block w-full" placeholder="Ex: 2 packs" /></div>
+                    <div class="pt-4"><x-primary-button class="w-full py-4 fuchsia-neon text-white uppercase font-black tracking-widest">AJOUTER À LA LISTE</x-primary-button></div>
+                </form>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>

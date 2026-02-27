@@ -84,14 +84,40 @@ class ColocationController extends Controller
         });
 
         $totalMonthly = $expenses->sum('amount');
+        $memberCount = $colocation->members()->whereNull('left_at')->count();
+        $fairShare = $memberCount > 0 ? $totalMonthly / $memberCount : 0;
+
+        // Calculer les balances individuelles
+        $balances = $colocation->members()->whereNull('left_at')->get()->map(function ($member) use ($expenses, $fairShare) {
+            $paidByMember = $expenses->where('user_id', $member->id)->sum('amount');
+            return [
+                'user' => $member,
+                'paid' => $paidByMember,
+                'balance' => $paidByMember - $fairShare,
+            ];
+        });
 
         $colocation->load(['members' => function($query) {
             $query->whereNull('left_at');
         }]);
         
         $categories = \App\Models\Category::all();
+        $tasks = $colocation->tasks()->with('user')->get();
+        $shoppingItems = $colocation->shoppingItems()->where('is_bought', false)->get();
 
-        return view('colocations.show', compact('colocation', 'expenses', 'stats', 'totalMonthly', 'month', 'year', 'categories'));
+        return view('colocations.show', compact(
+            'colocation', 
+            'expenses', 
+            'stats', 
+            'totalMonthly', 
+            'month', 
+            'year', 
+            'categories', 
+            'balances', 
+            'fairShare',
+            'tasks',
+            'shoppingItems'
+        ));
     }
 
     
