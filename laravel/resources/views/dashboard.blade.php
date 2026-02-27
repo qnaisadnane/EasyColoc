@@ -31,6 +31,57 @@
                         </div>
                     </div>
 
+                    @php
+                        $pendingInvitations = \App\Models\Invitation::where('email', auth()->user()->email)
+                            ->where('status', 'pending')
+                            ->with('colocation')
+                            ->get();
+                    @endphp
+
+                    @if($pendingInvitations->isNotEmpty())
+                        <div xl-glass class="p-8 rounded-[2.5rem] border border-indigo-500/30 bg-indigo-500/5 relative overflow-hidden group mb-10">
+                            <div class="absolute -top-12 -right-12 h-32 w-32 bg-indigo-500/20 rounded-full blur-3xl"></div>
+                            
+                            <h4 class="text-sm font-black text-indigo-400 uppercase tracking-widest mb-6 flex items-center">
+                                <span class="h-2 w-2 rounded-full bg-indigo-500 animate-ping mr-3"></span>
+                                Invitations en attente ({{ $pendingInvitations->count() }})
+                            </h4>
+
+                            <div class="space-y-4">
+                                @foreach($pendingInvitations as $invitation)
+                                    <div class="flex items-center justify-between p-6 rounded-3xl bg-white/5 border border-white/10 group/item hover:border-indigo-500/30 transition-all">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="h-12 w-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20">
+                                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p class="text-white font-black text-lg">{{ $invitation->colocation->name }}</p>
+                                                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Invitation à rejoindre</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center space-x-3">
+                                            <form action="{{ route('invitations.accept', $invitation) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 uppercase tracking-widest">
+                                                    ACCEPTER
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('invitations.decline', $invitation) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="px-5 py-2.5 bg-white/5 hover:bg-red-500/10 text-slate-400 hover:text-red-500 border border-white/10 hover:border-red-500/30 text-[10px] font-black rounded-xl transition-all uppercase tracking-widest">
+                                                    REFUSER
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- News/Updates Island -->
                     <div xl-glass class="p-8 rounded-[2.5rem] border border-white/5">
                         <h4 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-8">Journal d'activité</h4>

@@ -19,7 +19,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/colocations/{colocation}/remove/{user}', [\App\Http\Controllers\ColocationController::class, 'removeMember'])->name('colocations.removeMember');
     Route::resource('colocations', \App\Http\Controllers\ColocationController::class);
     Route::post('/colocations/{colocation}/invite', [\App\Http\Controllers\InvitationController::class, 'store'])->name('invitations.store');
-    Route::get('/invitations/{token}', [\App\Http\Controllers\InvitationController::class, 'accept'])->name('invitations.accept');
+    Route::post('/invitations/{invitation}/accept', [\App\Http\Controllers\InvitationController::class, 'accept'])->name('invitations.accept');
+    Route::post('/invitations/{invitation}/decline', [\App\Http\Controllers\InvitationController::class, 'decline'])->name('invitations.decline');
     
     // Dépenses
     Route::post('/colocations/{colocation}/expenses', [\App\Http\Controllers\DepenseController::class, 'store'])->name('depenses.store');
