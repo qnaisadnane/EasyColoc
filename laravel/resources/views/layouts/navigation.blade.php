@@ -22,6 +22,11 @@
                             <x-nav-link :href="route('colocations.index')" :active="request()->routeIs('colocations.*')">
                                 {{ __('Mes Colocations') }}
                             </x-nav-link>
+                            @if(Auth::user()->role === 'admin')
+                                <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')" class="text-indigo-400">
+                                    {{ __('Admin') }}
+                                </x-nav-link>
+                            @endif
                         </div>
                     </div>
 
@@ -81,6 +86,11 @@
                     <x-responsive-nav-link :href="route('colocations.index')" :active="request()->routeIs('colocations.*')">
                         {{ __('Mes Colocations') }}
                     </x-responsive-nav-link>
+                    @if(Auth::user()->role === 'admin')
+                        <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')" class="text-indigo-400">
+                            {{ __('Administration') }}
+                        </x-responsive-nav-link>
+                    @endif
                     <div class="pt-4 mt-4 border-t border-white/5">
                         <div class="flex items-center px-2">
                             <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-500 to-fuchsia-500 flex items-center justify-center font-bold text-white">

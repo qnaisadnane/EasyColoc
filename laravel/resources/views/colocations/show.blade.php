@@ -57,7 +57,7 @@
         </div>
     </x-slot>
 
-    <div class="py-12" x-data="{ openExpenseModal: false, openTaskModal: false, openShoppingModal: false }">
+    <div class="py-12" x-data="{ openExpenseModal: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 <!-- Flux de Dépenses -->
@@ -157,82 +157,6 @@
                         </div>
                     </div>
 
-                    <!-- Planning des Tâches -->
-                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5 relative overflow-hidden group">
-                        <div class="flex items-center justify-between mb-8">
-                            <h3 class="text-xl font-black text-white tracking-tight">Planning</h3>
-                            <button @click="openTaskModal = true" class="text-indigo-400 hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                            </button>
-                        </div>
-
-                        <div class="space-y-4">
-                            @forelse($tasks as $task)
-                                <div class="p-5 rounded-3xl bg-white/[0.03] border border-white/5 group/task flex items-center justify-between">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                        </div>
-                                        <div>
-                                            <p class="text-white font-black text-sm uppercase tracking-tight">{{ $task->name }}</p>
-                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-                                                Assigné à : {{ $task->user->name ?? 'Tous' }} • {{ $task->frequency }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <form action="{{ route('tasks.complete', $task) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="h-8 w-8 rounded-full bg-white/5 hover:bg-emerald-500/20 text-slate-500 hover:text-emerald-400 border border-white/10 transition-all flex items-center justify-center shadow-lg">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            @empty
-                                <p class="text-center text-slate-600 text-[10px] font-black uppercase tracking-widest py-4 italic">Aucune corvée prévue</p>
-                            @endforelse
-                        </div>
-                    </div>
-
-                    <!-- Liste de Courses -->
-                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5 relative overflow-hidden">
-                         <div class="flex items-center justify-between mb-8">
-                            <h3 class="text-xl font-black text-white tracking-tight">Liste de courses</h3>
-                            <button @click="openShoppingModal = true" class="text-fuchsia-400 hover:text-white transition-colors">
-                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                            </button>
-                        </div>
-
-                        <div class="space-y-3">
-                            @forelse($shoppingItems as $item)
-                                <div class="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-all group/shop">
-                                    <div class="flex items-center space-x-3">
-                                        <form action="{{ route('shopping.toggle', $item) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="h-5 w-5 rounded-md border border-fuchsia-500/30 flex items-center justify-center bg-fuchsia-500/5 hover:bg-fuchsia-500/20 transition-all">
-                                                <div class="h-2 w-2 rounded-sm bg-fuchsia-500 opacity-0 group-hover/shop:opacity-30"></div>
-                                            </button>
-                                        </form>
-                                        <div>
-                                            <p class="text-slate-200 font-bold text-xs uppercase tracking-tight">{{ $item->name }}</p>
-                                            @if($item->quantity)
-                                                <p class="text-[9px] font-bold text-slate-600 uppercase">{{ $item->quantity }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <form action="{{ route('shopping.destroy', $item) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-slate-700 hover:text-rose-500 transition-colors opacity-0 group-hover/shop:opacity-100">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            @empty
-                                <p class="text-center text-slate-600 text-[10px] font-black uppercase tracking-widest py-4 italic">Le frigo est plein !</p>
-                            @endforelse
-                        </div>
-                    </div>
-
                     <!-- Escouade (Compact) -->
                     <div xl-glass class="p-10 rounded-[3rem] border border-white/5">
                         <h3 class="text-xl font-black text-white tracking-tight mb-8">Escouade</h3>
@@ -270,37 +194,6 @@
             </div>
         </div>
 
-        <!-- Modal Tâche -->
-        <div x-show="openTaskModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" x-cloak>
-            <div xl-glass class="w-full max-w-lg p-10 rounded-[3rem] border border-white/10 shadow-2xl relative" @click.away="openTaskModal = false">
-                <button @click="openTaskModal = false" class="absolute top-8 right-8 text-slate-500 hover:text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
-                <h3 class="text-3xl font-black text-white tracking-tighter mb-8 uppercase">Nouvelle Corvée</h3>
-                <form action="{{ route('tasks.store', $colocation) }}" method="POST" class="space-y-6">
-                    @csrf
-                    <div><x-input-label for="name" :value="__('NOM DE LA TÂCHE')" /><x-text-input id="name" name="name" type="text" class="block w-full" placeholder="Ex: Sortir les poubelles" required /></div>
-                    <div class="grid grid-cols-2 gap-6">
-                        <div><x-input-label for="frequency" :value="__('FRÉQUENCE')" /><select name="frequency" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold"><option value="daily">Quotidien</option><option value="weekly">Hebdo</option><option value="monthly">Mensuel</option></select></div>
-                        <div><x-input-label for="points" :value="__('POINTS')" /><x-text-input id="points" name="points" type="number" class="block w-full" value="10" required /></div>
-                    </div>
-                    <div><x-input-label for="user_id" :value="__('ASSIGNÉ À (OPTIONNEL)')" /><select name="user_id" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold"><option value="">Tous les membres</option>@foreach($colocation->members as $member)<option value="{{ $member->id }}">{{ $member->name }}</option>@endforeach</select></div>
-                    <div class="pt-4"><x-primary-button class="w-full py-4 uppercase font-black tracking-widest">PLANIFIER</x-primary-button></div>
-                </form>
-            </div>
         </div>
-
-        <!-- Modal Liste de Courses -->
-        <div x-show="openShoppingModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" x-cloak>
-            <div xl-glass class="w-full max-w-lg p-10 rounded-[3rem] border border-white/10 shadow-2xl relative" @click.away="openShoppingModal = false">
-                <button @click="openShoppingModal = false" class="absolute top-8 right-8 text-slate-500 hover:text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
-                <h3 class="text-3xl font-black text-white tracking-tighter mb-8 uppercase">Ajouter aux courses</h3>
-                <form action="{{ route('shopping.store', $colocation) }}" method="POST" class="space-y-6">
-                    @csrf
-                    <div><x-input-label for="name" :value="__('PRODUIT')" /><x-text-input id="name" name="name" type="text" class="block w-full" placeholder="Ex: Lait d'avoine" required /></div>
-                    <div><x-input-label for="quantity" :value="__('QUANTITÉ / NOTE')" /><x-text-input id="quantity" name="quantity" type="text" class="block w-full" placeholder="Ex: 2 packs" /></div>
-                    <div class="pt-4"><x-primary-button class="w-full py-4 fuchsia-neon text-white uppercase font-black tracking-widest">AJOUTER À LA LISTE</x-primary-button></div>
-                </form>
-            </div>
-        </div>
-
     </div>
 </x-app-layout>

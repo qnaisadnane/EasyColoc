@@ -27,14 +27,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'update'])->name('depenses.update');
     Route::delete('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'destroy'])->name('depenses.destroy');
 
-    // Tâches & Courses
-    Route::post('/colocations/{colocation}/tasks', [\App\Http\Controllers\TaskController::class, 'store'])->name('tasks.store');
-    Route::post('/tasks/{task}/complete', [\App\Http\Controllers\TaskController::class, 'complete'])->name('tasks.complete');
-    Route::delete('/tasks/{task}', [\App\Http\Controllers\TaskController::class, 'destroy'])->name('tasks.destroy');
 
-    Route::post('/colocations/{colocation}/shopping', [\App\Http\Controllers\ShoppingController::class, 'store'])->name('shopping.store');
-    Route::post('/shopping/{item}/toggle', [\App\Http\Controllers\ShoppingController::class, 'toggle'])->name('shopping.toggle');
-    Route::delete('/shopping/{item}', [\App\Http\Controllers\ShoppingController::class, 'destroy'])->name('shopping.destroy');
+    // Administration
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/', [\App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
+        Route::post('/users/{user}/toggle-ban', [\App\Http\Controllers\AdminController::class, 'toggleBan'])->name('admin.users.ban');
+        
+        // Catégories
+        Route::post('/categories', [\App\Http\Controllers\AdminController::class, 'storeCategory'])->name('admin.categories.store');
+        Route::patch('/categories/{category}', [\App\Http\Controllers\AdminController::class, 'updateCategory'])->name('admin.categories.update');
+        Route::delete('/categories/{category}', [\App\Http\Controllers\AdminController::class, 'destroyCategory'])->name('admin.categories.destroy');
+    });
 });
 
 require __DIR__.'/auth.php';

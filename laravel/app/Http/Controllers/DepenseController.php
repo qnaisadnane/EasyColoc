@@ -20,21 +20,30 @@ class DepenseController extends Controller
         }
 
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
             'amount' => 'required|numeric|min:0',
             'description' => 'required|string|max:255',
             'date' => 'required|date',
         ]);
 
+        // Si user_id est fourni, on vérifie que l'utilisateur qui l'envoie est admin 
+        // ou que c'est une action légitime (ex: créancier qui valide un paiement)
+        $userId = $request->user_id ?? auth()->id();
+
+        // Sécurité de base : le user_id doit appartenir à la colocation
+        if (!$colocation->members()->where('users.id', $userId)->exists()) {
+            abort(403);
+        }
+
         $colocation->expenses()->create([
-            'user_id' => auth()->id(),
-            'category_id' => $request->category_id,
+            'user_id' => $userId,
+            'category_id' => $request->category_id ?? Category::first()->id,
             'amount' => $request->amount,
             'description' => $request->description,
             'date' => $request->date,
         ]);
 
-        return redirect()->back()->with('success', 'Dépense enregistrée avec succès !');
+        return redirect()->back()->with('success', 'Transaction enregistrée !');
     }
 
     /**

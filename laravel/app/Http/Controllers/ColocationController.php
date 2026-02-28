@@ -101,9 +101,11 @@ class ColocationController extends Controller
             $query->whereNull('left_at');
         }]);
         
+        $colocation->load(['members' => function($query) {
+            $query->whereNull('left_at');
+        }]);
+        
         $categories = \App\Models\Category::all();
-        $tasks = $colocation->tasks()->with('user')->get();
-        $shoppingItems = $colocation->shoppingItems()->where('is_bought', false)->get();
 
         return view('colocations.show', compact(
             'colocation', 
@@ -114,11 +116,10 @@ class ColocationController extends Controller
             'year', 
             'categories', 
             'balances', 
-            'fairShare',
-            'tasks',
-            'shoppingItems'
+            'fairShare'
         ));
     }
+
 
     
     public function leave(Colocation $colocation)
@@ -128,6 +129,15 @@ class ColocationController extends Controller
         // Un propriétaire ne peut pas quitter sa propre colocation (il doit l'annuler ou transférer)
         if ($colocation->owner->contains($user)) {
             return redirect()->back()->with('error', 'Le propriétaire ne peut pas quitter la colocation.');
+        }
+
+        // Calculer le solde avant de partir pour la réputation
+        $balance = $this->calculateMemberBalance($colocation, $user);
+
+        if ($balance < -0.01) {
+            $user->decrement('reputation');
+        } else {
+            $user->increment('reputation');
         }
 
         $colocation->members()->updateExistingPivot($user->id, ['left_at' => now()]);
@@ -146,6 +156,15 @@ class ColocationController extends Controller
 
         if ($colocation->owner->contains($user)) {
             return redirect()->back()->with('error', 'Vous ne pouvez pas vous retirer vous-même.');
+        }
+
+        // Calculer le solde avant l'exclusion
+        $balance = $this->calculateMemberBalance($colocation, $user);
+
+        if ($balance < -0.01) {
+            $user->decrement('reputation');
+        } else {
+            $user->increment('reputation');
         }
 
         $colocation->members()->updateExistingPivot($user->id, ['left_at' => now()]);
@@ -175,5 +194,15 @@ class ColocationController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    private function calculateMemberBalance(Colocation $colocation, $user)
+    {
+        $expenses = $colocation->expenses()->whereMonth('date', now()->month)->get();
+        $memberCount = $colocation->members()->whereNull('left_at')->count();
+        $fairShare = $memberCount > 0 ? $expenses->sum('amount') / $memberCount : 0;
+        $paidByMember = $expenses->where('user_id', $user->id)->sum('amount');
+        
+        return $paidByMember - $fairShare;
     }
 }

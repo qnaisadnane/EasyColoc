@@ -74,7 +74,7 @@
                     </h1>
 
                     <p class="text-xl text-slate-400 max-w-xl font-medium leading-relaxed">
-                        EasyColoc centralise vos dépenses, vos tâches ménagères et votre liste de courses dans une interface crystal-clear. Équilibrez les comptes instantanément.
+                        EasyColoc centralise vos dépenses dans une interface crystal-clear. Équilibrez les comptes instantanément.
                     </p>
 
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 pt-6">
@@ -114,7 +114,7 @@
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-32 space-y-6">
                     <h2 class="text-5xl font-black tracking-tight text-white uppercase">Tout ce dont vous avez besoin</h2>
-                    <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Une suite d'outils pensée pour la vie à plusieurs, du règlement des dettes au planning ménage.</p>
+                    <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Une suite d'outils pensée pour la vie à plusieurs et le règlement des dépenses.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -129,27 +129,6 @@
                         <p class="text-slate-500 font-medium">Fini les calculs interminables. Saisissez vos dépenses et laissez EasyColoc équilibrer les balances en temps réel.</p>
                     </div>
 
-                    <!-- Feature 2 -->
-                    <div class="glass-card p-10 rounded-[3rem] hover:translate-y-[-10px] transition-all duration-500 border-indigo-500/20">
-                        <div class="h-14 w-14 rounded-2xl bg-fuchsia-600/20 flex items-center justify-center text-fuchsia-400 mb-8 border border-fuchsia-500/30">
-                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                        </div>
-                        <h4 class="text-2xl font-black text-white mb-4 uppercase tracking-tight">Planning Zen</h4>
-                        <p class="text-slate-500 font-medium">Attribuez les corvées par membre ou par fréquence. Gagnez des points en validant vos tâches hebdomadaires.</p>
-                    </div>
-
-                    <!-- Feature 3 -->
-                    <div class="glass-card p-10 rounded-[3rem] hover:translate-y-[-10px] transition-all duration-500">
-                        <div class="h-14 w-14 rounded-2xl bg-emerald-600/20 flex items-center justify-center text-emerald-400 mb-8 border border-emerald-500/30">
-                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </div>
-                        <h4 class="text-2xl font-black text-white mb-4 uppercase tracking-tight">Courses Communes</h4>
-                        <p class="text-slate-500 font-medium">Ajoutez des articles en un clic. Tous les membres reçoivent la notification quand le frigo est vide.</p>
-                    </div>
                 </div>
             </div>
         </section>
