@@ -55,8 +55,8 @@ class DepenseController extends Controller
         $isOwner = $colocation->owner()->where('users.id', auth()->id())->exists();
         $isPayer = $expense->user_id === auth()->id();
 
-        if (!$isOwner && !$isPayer) {
-            abort(403, 'Seul le payeur ou le propriétaire peut modifier cette dépense.');
+        if (!$isPayer) {
+            abort(403, 'Seul le payeur peut modifier cette dépense.');
         }
 
         $request->validate([
@@ -80,8 +80,8 @@ class DepenseController extends Controller
         $isOwner = $colocation->owner()->where('users.id', auth()->id())->exists();
         $isPayer = $expense->user_id === auth()->id();
 
-        if (!$isOwner && !$isPayer) {
-            abort(403, 'Seul le payeur ou le propriétaire peut supprimer cette dépense.');
+        if (!$isPayer) {
+            abort(403, 'Seul le payeur peut supprimer cette dépense.');
         }
 
         $expense->delete();

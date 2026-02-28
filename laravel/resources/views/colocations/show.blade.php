@@ -105,7 +105,7 @@
                                         <div class="text-right flex items-center space-x-6">
                                             <p class="text-2xl font-black text-white tracking-tighter">{{ number_format($expense->amount, 2) }}€</p>
                                             
-                                            @if(auth()->id() === $expense->user_id || $isOwner)
+                                            @if(auth()->id() === $expense->user_id)
                                                 <form action="{{ route('depenses.destroy', $expense) }}" method="POST" onsubmit="return confirm('Supprimer cette dépense ?')">
                                                     @csrf
                                                     @method('DELETE')
