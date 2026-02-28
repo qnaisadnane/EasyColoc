@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('colocations', \App\Http\Controllers\ColocationController::class);
     Route::post('/colocations/{colocation}/invite', [\App\Http\Controllers\InvitationController::class, 'store'])->name('invitations.store');
     Route::post('/invitations/{invitation}/accept', [\App\Http\Controllers\InvitationController::class, 'accept'])->name('invitations.accept');
+    Route::post('/colocations/{colocation}/settlements', [\App\Http\Controllers\SettlementController::class, 'store'])->name('settlements.store');
     Route::post('/invitations/{invitation}/decline', [\App\Http\Controllers\InvitationController::class, 'decline'])->name('invitations.decline');
     
     // Dépenses

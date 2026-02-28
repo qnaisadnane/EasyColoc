@@ -11,6 +11,8 @@ class Settlement extends Model
         'debtor_id',
         'creditor_id',
         'amount',
+        'month',
+        'year',
         'status',
         'paid_at',
     ];

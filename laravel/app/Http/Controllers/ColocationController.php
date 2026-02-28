@@ -88,13 +88,28 @@ class ColocationController extends Controller
         $memberCount = $colocation->members()->whereNull('left_at')->count();
         $fairShare = $memberCount > 0 ? $totalMonthly / $memberCount : 0;
 
+        // Récupérer les règlements payés pour ce mois
+        $settlements = \App\Models\Settlement::where('colocation_id', $colocation->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->where('status', 'paid')
+            ->get();
+
         // Calculer les balances individuelles
-        $balances = $colocation->members()->whereNull('left_at')->get()->map(function ($member) use ($expenses, $fairShare) {
+        $balances = $colocation->members()->whereNull('left_at')->get()->map(function ($member) use ($expenses, $fairShare, $settlements) {
             $paidByMember = $expenses->where('user_id', $member->id)->sum('amount');
+            
+            // Ce que le membre a reçu d'autres colocataires (en tant que créancier)
+            $received = $settlements->where('creditor_id', $member->id)->sum('amount');
+            // Ce que le membre a payé aux autres (en tant que débiteur)
+            $paidToOthers = $settlements->where('debtor_id', $member->id)->sum('amount');
+
             return [
                 'user' => $member,
-                'paid' => $paidByMember,
-                'balance' => $paidByMember - $fairShare,
+                'paid' => $paidByMember, // Montant initial (dépenses)
+                'received' => $received,
+                'sent' => $paidToOthers,
+                'balance' => ($paidByMember - $fairShare) - $received + $paidToOthers,
             ];
         });
 
@@ -108,6 +123,9 @@ class ColocationController extends Controller
         
         $categories = \App\Models\Category::all();
 
+        // Simplification des dettes (calculer qui doit à qui)
+        $suggestedSettlements = $this->simplifyDebts($balances, $colocation->id);
+
         return view('colocations.show', compact(
             'colocation', 
             'expenses', 
@@ -117,8 +135,51 @@ class ColocationController extends Controller
             'year', 
             'categories', 
             'balances', 
-            'fairShare'
+            'fairShare',
+            'suggestedSettlements'
         ));
+    }
+
+    /**
+     * Algorithme greedy de simplification des dettes
+     */
+    private function simplifyDebts($balances, $colocationId)
+    {
+        $debtors = [];
+        $creditors = [];
+
+        foreach ($balances as $b) {
+            $amount = round($b['balance'], 2);
+            if ($amount < -0.01) {
+                $debtors[] = ['user' => $b['user'], 'amount' => abs($amount)];
+            } elseif ($amount > 0.01) {
+                $creditors[] = ['user' => $b['user'], 'amount' => $amount];
+            }
+        }
+
+        $suggested = [];
+        $i = 0; $j = 0;
+
+        while ($i < count($debtors) && $j < count($creditors)) {
+            $debtor = &$debtors[$i];
+            $creditor = &$creditors[$j];
+
+            $payment = min($debtor['amount'], $creditor['amount']);
+            
+            $suggested[] = [
+                'debtor' => $debtor['user'],
+                'creditor' => $creditor['user'],
+                'amount' => $payment,
+            ];
+
+            $debtor['amount'] -= $payment;
+            $creditor['amount'] -= $payment;
+
+            if ($debtor['amount'] < 0.01) $i++;
+            if ($creditor['amount'] < 0.01) $j++;
+        }
+
+        return $suggested;
     }
 
 

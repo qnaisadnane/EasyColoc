@@ -124,9 +124,59 @@
 
                 <!-- Règlements (Balances) -->
                 <div class="lg:col-span-4 space-y-10">
+                    <div xl-glass class="p-10 rounded-[3rem] border border-white/5 bg-gradient-to-br from-indigo-600/10 to-transparent relative overflow-hidden mb-10">
+                        <div class="absolute -top-12 -left-12 h-32 w-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                        <h3 class="text-xl font-black text-white tracking-tight mb-8 relative z-10 uppercase">Simpli-Dettes</h3>
+                        
+                        <div class="space-y-6 relative z-10">
+                            @forelse($suggestedSettlements as $suggested)
+                                <div class="p-5 rounded-[2rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex -space-x-3">
+                                                <div class="h-10 w-10 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-xs font-black text-rose-400" title="Doit payer">
+                                                    {{ substr($suggested['debtor']->name, 0, 1) }}
+                                                </div>
+                                                <div class="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-black text-emerald-400 z-10" title="Reçoit le paiement">
+                                                    {{ substr($suggested['creditor']->name, 0, 1) }}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p class="text-[11px] font-black text-white leading-tight">
+                                                    <span class="text-rose-400 uppercase">{{ $suggested['debtor']->name }}</span>
+                                                    <span class="text-slate-500 mx-1">→</span>
+                                                    <span class="text-emerald-400 uppercase">{{ $suggested['creditor']->name }}</span>
+                                                </p>
+                                                <p class="text-[15px] font-black text-white tracking-tighter mt-1">{{ number_format($suggested['amount'], 2) }}€</p>
+                                            </div>
+                                        </div>
+
+                                        @if(auth()->id() === $suggested['creditor']->id)
+                                            <form action="{{ route('settlements.store', $colocation) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="debtor_id" value="{{ $suggested['debtor']->id }}">
+                                                <input type="hidden" name="creditor_id" value="{{ $suggested['creditor']->id }}">
+                                                <input type="hidden" name="amount" value="{{ $suggested['amount'] }}">
+                                                <input type="hidden" name="month" value="{{ $month }}">
+                                                <input type="hidden" name="year" value="{{ $year }}">
+                                                <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-emerald-600/20">
+                                                    Confirmé
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-4">
+                                    <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">Tout est en ordre ! ✨</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
                     <div xl-glass class="p-10 rounded-[3rem] border border-white/5 bg-gradient-to-br from-fuchsia-600/10 to-transparent relative overflow-hidden">
                         <div class="absolute -top-12 -left-12 h-32 w-32 bg-fuchsia-500/10 rounded-full blur-3xl"></div>
-                        <h3 class="text-xl font-black text-white tracking-tight mb-8 relative z-10">Règlements théorique</h3>
+                        <h3 class="text-xl font-black text-white tracking-tight mb-8 relative z-10 uppercase">Positions Actuelles</h3>
                         
                         <div class="space-y-6 relative z-10">
                             @foreach($balances as $balance)
@@ -141,12 +191,14 @@
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-black {{ $balance['balance'] >= 0 ? 'text-emerald-400' : 'text-rose-400' }}">
-                                            {{ $balance['balance'] >= 0 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}€
-                                        </p>
-                                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-                                            {{ $balance['balance'] >= 0 ? 'À RECEVOIR' : 'À PAYER' }}
-                                        </p>
+                                        <div class="flex flex-col items-end">
+                                            <p class="text-sm font-black {{ $balance['balance'] >= 0.01 ? 'text-emerald-400' : ($balance['balance'] <= -0.01 ? 'text-rose-400' : 'text-slate-500') }}">
+                                                {{ $balance['balance'] >= 0.01 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}€
+                                            </p>
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                                {{ $balance['balance'] >= 0.01 ? 'À RECEVOIR' : ($balance['balance'] <= -0.01 ? 'À PAYER' : 'ÉQUILIBRÉ') }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
