@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Colocation;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ColocationController extends Controller
@@ -125,10 +126,12 @@ class ColocationController extends Controller
     public function leave(Colocation $colocation)
     {
         $user = auth()->user();
-        
-        // Un propriétaire ne peut pas quitter sa propre colocation (il doit l'annuler ou transférer)
-        if ($colocation->owner->contains($user)) {
-            return redirect()->back()->with('error', 'Le propriétaire ne peut pas quitter la colocation.');
+        $activeMembers = $colocation->members()->whereNull('left_at')->get();
+        $isOwner = $colocation->owner->contains($user);
+
+        // Si c'est le propriétaire et qu'il y a d'autres membres
+        if ($isOwner && $activeMembers->count() > 1) {
+            return redirect()->back()->with('error', 'En tant que propriétaire, vous devez retirer tous les autres membres avant de pouvoir quitter et fermer la colocation.');
         }
 
         // Calculer le solde avant de partir pour la réputation
@@ -140,7 +143,13 @@ class ColocationController extends Controller
             $user->increment('reputation');
         }
 
+        // Marquer le départ
         $colocation->members()->updateExistingPivot($user->id, ['left_at' => now()]);
+
+        // Si c'était le dernier membre (donc le propriétaire), on désactive la coloc
+        if ($isOwner) {
+            $colocation->update(['status' => 'inactive']);
+        }
 
         return redirect()->route('dashboard')->with('success', 'Vous avez quitté la colocation.');
     }

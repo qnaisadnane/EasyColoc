@@ -1,4 +1,7 @@
 <x-app-layout>
+    @php
+        $isOwner = $colocation->owner->contains(auth()->user());
+    @endphp
     <x-slot name="header">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-4">
             <div class="flex items-center space-x-6">
@@ -38,9 +41,6 @@
                     </select>
                 </form>
 
-                @php
-                    $isOwner = $colocation->owner->contains(auth()->user());
-                @endphp
 
                 @if($isOwner)
                     <div xl-glass class="p-1 rounded-2xl border border-white/5 shadow-2xl overflow-hidden group">
@@ -160,15 +160,42 @@
                     <!-- Escouade (Compact) -->
                     <div xl-glass class="p-10 rounded-[3rem] border border-white/5">
                         <h3 class="text-xl font-black text-white tracking-tight mb-8">Escouade</h3>
-                        <div class="flex flex-wrap gap-4">
+                        <div class="space-y-6">
                             @foreach($colocation->members as $member)
-                                <div class="relative group" title="{{ $member->name }}">
-                                    <div class="h-12 w-12 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-indigo-400 font-black shadow-inner group-hover:border-indigo-500/50 transition-all">
-                                        {{ substr($member->name, 0, 1) }}
+                                <div class="flex items-center justify-between group/member">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="relative">
+                                            <div class="h-12 w-12 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-indigo-400 font-black shadow-inner group-hover/member:border-indigo-500/50 transition-all">
+                                                {{ substr($member->name, 0, 1) }}
+                                            </div>
+                                            <div class="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-slate-950 {{ $member->pivot->role === 'owner' ? 'bg-amber-400' : 'bg-indigo-500' }}"></div>
+                                        </div>
+                                        <div>
+                                            <p class="text-white font-black text-sm">{{ $member->name }}</p>
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{{ $member->pivot->role === 'owner' ? 'Propriétaire' : 'Colocataire' }}</p>
+                                        </div>
                                     </div>
-                                    <div class="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-slate-950 {{ $member->pivot->role === 'owner' ? 'bg-amber-400' : 'bg-indigo-500' }}"></div>
+
+                                    @if($isOwner && $member->id !== auth()->id())
+                                        <form action="{{ route('colocations.removeMember', [$colocation, $member]) }}" method="POST" onsubmit="return confirm('Retirer ce membre de la colocation ?')">
+                                            @csrf
+                                            <button type="submit" class="p-2 text-slate-600 hover:text-rose-500 transition-colors opacity-0 group-hover/member:opacity-100">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             @endforeach
+                        </div>
+
+                        <div class="mt-10 pt-8 border-t border-white/5 text-center">
+                            <form action="{{ route('colocations.leave', $colocation) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir quitter cette colocation ?')">
+                                @csrf
+                                <button type="submit" class="text-[10px] font-black text-slate-600 hover:text-rose-400 uppercase tracking-widest transition-colors flex items-center justify-center mx-auto space-x-2">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                                    <span>Quitter la colocation</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
