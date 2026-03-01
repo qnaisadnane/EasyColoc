@@ -16,12 +16,15 @@ class AdminController extends Controller
             'total_users' => User::count(),
             'total_colocations' => Colocation::count(),
             'total_expenses' => Expense::sum('amount'),
-            'active_colocations' => Colocation::count(), // Simplifié
+            'active_colocations' => Colocation::where('status', 'active')->count(),
+            'cancelled_colocations' => Colocation::where('status', 'cancelled')->count(),
             'banned_users' => User::where('is_banned', true)->count(),
         ];
 
         $users = User::orderBy('created_at', 'desc')->get();
-        $categories = Category::all();
+        $categories = Category::withSum('expenses', 'amount')
+            ->withCount('expenses')
+            ->get();
 
         return view('admin.dashboard', compact('stats', 'users', 'categories'));
     }

@@ -29,7 +29,10 @@
                     <div class="absolute -top-12 -right-12 h-32 w-32 bg-fuchsia-500/10 rounded-full blur-3xl group-hover:bg-fuchsia-500/20 transition-all"></div>
                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Colocations</p>
                     <h3 class="text-4xl font-black text-white">{{ $stats['total_colocations'] }}</h3>
-                    <p class="text-[10px] font-bold text-fuchsia-400 mt-4 uppercase tracking-widest">Communautés actives</p>
+                    <div class="flex items-center space-x-3 mt-4">
+                        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{{ $stats['active_colocations'] }} Actives</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $stats['cancelled_colocations'] }} Annulées</span>
+                    </div>
                 </div>
 
                 <!-- Total Expenses -->
@@ -158,9 +161,14 @@
                                     </div>
                                 </td>
                                 <td class="px-8 py-6">
-                                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                        {{ $category->expenses_count ?? 0 }} DEPENSES
-                                    </span>
+                                    <div class="flex flex-col space-y-1">
+                                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-slate-400 uppercase tracking-widest w-fit">
+                                            {{ $category->expenses_count ?? 0 }} DEPENSES
+                                        </span>
+                                        <span class="text-[11px] font-black text-emerald-400 ml-1">
+                                            {{ number_format($category->expenses_sum_amount ?? 0, 2) }} €
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-8 py-6 text-right">
                                     <div class="flex items-center justify-end space-x-3">

@@ -63,7 +63,7 @@
                                         </div>
 
                                         <div class="flex items-center space-x-3">
-                                            <form action="{{ route('invitations.accept', $invitation) }}" method="POST">
+                                            <form action="{{ route('invitations.accept', $invitation->token) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 uppercase tracking-widest">
                                                     ACCEPTER

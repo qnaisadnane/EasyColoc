@@ -22,7 +22,7 @@ class SettlementController extends Controller
             abort(403, "Seul le destinataire du paiement peut valider cette transaction.");
         }
 
-        Settlement::create([
+        $settlement = Settlement::create([
             'colocation_id' => $colocation->id,
             'debtor_id' => $request->debtor_id,
             'creditor_id' => $request->creditor_id,
@@ -32,6 +32,9 @@ class SettlementController extends Controller
             'status' => 'paid',
             'paid_at' => now(),
         ]);
+
+        // Gain de réputation pour le payeur
+        $settlement->debtor->increment('reputation');
 
         return redirect()->back()->with('success', 'Règlement enregistré par le créancier !');
     }

@@ -28,17 +28,20 @@
                 <!-- Filtre Temporel -->
                 <form method="GET" class="flex items-center bg-white/5 border border-white/10 rounded-2xl p-1">
                     <select name="month" onchange="this.form.submit()" class="bg-transparent border-none text-slate-300 font-black text-xs uppercase tracking-widest focus:ring-0 cursor-pointer">
+                        <option value="" {{ !$month ? 'selected' : '' }}>Toutes les dates</option>
                         @for($m=1; $m<=12; $m++)
                             <option value="{{ sprintf('%02d', $m) }}" {{ $month == sprintf('%02d', $m) ? 'selected' : '' }}>
                                 {{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
                             </option>
                         @endfor
                     </select>
-                    <select name="year" onchange="this.form.submit()" class="bg-transparent border-none text-slate-300 font-black text-xs uppercase tracking-widest focus:ring-0 cursor-pointer">
-                        @for($y=date('Y'); $y>=date('Y')-2; $y--)
-                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                        @endfor
-                    </select>
+                    @if($month)
+                        <select name="year" onchange="this.form.submit()" class="bg-transparent border-none text-slate-300 font-black text-xs uppercase tracking-widest focus:ring-0 cursor-pointer">
+                            @for($y=date('Y'); $y>=date('Y')-2; $y--)
+                                <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                            @endfor
+                        </select>
+                    @endif
                 </form>
 
 
@@ -180,32 +183,39 @@
                         
                         <div class="space-y-6 relative z-10">
                             @foreach($balances as $balance)
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="h-10 w-10 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center text-xs font-black text-white">
-                                            {{ substr($balance['user']->name, 0, 1) }}
+                                @php
+                                    $isHistorical = !is_null($balance['user']->pivot->left_at);
+                                    $hasNoBalance = abs($balance['balance']) < 0.01;
+                                @endphp
+
+                                @if(!$isHistorical || !$hasNoBalance)
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="h-10 w-10 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center text-xs font-black text-white">
+                                                {{ substr($balance['user']->name, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-black text-white uppercase">{{ $balance['user']->name }}</p>
+                                                <p class="text-[9px] font-bold text-slate-500">Payé: {{ number_format($balance['paid'], 2) }}€</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="text-xs font-black text-white uppercase">{{ $balance['user']->name }}</p>
-                                            <p class="text-[9px] font-bold text-slate-500">Payé: {{ number_format($balance['paid'], 2) }}€</p>
+                                        <div class="text-right">
+                                            <div class="flex flex-col items-end">
+                                                <p class="text-sm font-black {{ $balance['balance'] >= 0.01 ? 'text-emerald-400' : ($balance['balance'] <= -0.01 ? 'text-rose-400' : 'text-slate-500') }}">
+                                                    {{ $balance['balance'] >= 0.01 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}€
+                                                </p>
+                                                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                                    {{ $balance['balance'] >= 0.01 ? 'À RECEVOIR' : ($balance['balance'] <= -0.01 ? 'À PAYER' : 'ÉQUILIBRÉ') }}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="text-right">
-                                        <div class="flex flex-col items-end">
-                                            <p class="text-sm font-black {{ $balance['balance'] >= 0.01 ? 'text-emerald-400' : ($balance['balance'] <= -0.01 ? 'text-rose-400' : 'text-slate-500') }}">
-                                                {{ $balance['balance'] >= 0.01 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}€
-                                            </p>
-                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-                                                {{ $balance['balance'] >= 0.01 ? 'À RECEVOIR' : ($balance['balance'] <= -0.01 ? 'À PAYER' : 'ÉQUILIBRÉ') }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endif
                             @endforeach
                         </div>
                         
                         <div class="mt-8 pt-8 border-t border-white/5">
-                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center italic">Calculé sur la base de {{ number_format($fairShare, 2) }}€ / personne</p>
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center italic">Calcul des parts par dépense</p>
                         </div>
                     </div>
 
@@ -213,7 +223,7 @@
                     <div xl-glass class="p-10 rounded-[3rem] border border-white/5">
                         <h3 class="text-xl font-black text-white tracking-tight mb-8">Escouade</h3>
                         <div class="space-y-6">
-                            @foreach($colocation->members as $member)
+                            @foreach($colocation->members->where('pivot.left_at', null) as $member)
                                 <div class="flex items-center justify-between group/member">
                                     <div class="flex items-center space-x-4">
                                         <div class="relative">
@@ -223,7 +233,12 @@
                                             <div class="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-slate-950 {{ $member->pivot->role === 'owner' ? 'bg-amber-400' : 'bg-indigo-500' }}"></div>
                                         </div>
                                         <div>
-                                            <p class="text-white font-black text-sm">{{ $member->name }}</p>
+                                            <p class="text-white font-black text-sm">
+                                                {{ $member->name }}
+                                                <span class="ml-2 px-1.5 py-0.5 rounded text-[8px] font-black {{ $member->reputation > 0 ? 'bg-emerald-500/10 text-emerald-400' : ($member->reputation < 0 ? 'bg-rose-500/10 text-rose-400' : 'bg-slate-500/10 text-slate-500') }}">
+                                                    {{ $member->reputation > 0 ? '+' : '' }}{{ $member->reputation }}
+                                                </span>
+                                            </p>
                                             <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{{ $member->pivot->role === 'owner' ? 'Propriétaire' : 'Colocataire' }}</p>
                                         </div>
                                     </div>

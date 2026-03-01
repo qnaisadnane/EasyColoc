@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Invitation;
 use App\Models\Colocation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InvitationMail;
 use Illuminate\Support\Str;
 
 class InvitationController extends Controller
@@ -19,18 +21,27 @@ class InvitationController extends Controller
             'email' => 'required|email',
         ]);
 
-        Invitation::create([
+        $invitation = Invitation::create([
             'email' => $request->email,
             'token' => Str::random(40),
             'colocation_id' => $colocation->id,
             'status' => 'pending',
         ]);
 
-        return redirect()->back()->with('success', 'Invitation créée ! L\'utilisateur verra l\'invitation sur son tableau de bord.');
+        Mail::to($request->email)->send(new InvitationMail($invitation));
+
+        return redirect()->back()->with('success', 'Invitation envoyée avec succès par email !');
     }
 
-    public function accept(Invitation $invitation)
+    public function accept($token)
     {
+        $invitation = Invitation::where('token', $token)->where('status', 'pending')->firstOrFail();
+
+        if (!auth()->check()) {
+            session(['invitation_token' => $token]);
+            return redirect()->route('register')->with('info', 'Veuillez créer un compte pour rejoindre la colocation.');
+        }
+
         $user = auth()->user();
 
         if ($user->email !== $invitation->email) {

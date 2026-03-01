@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 use App\Models\Colocation;
 use App\Models\User;
+use App\Models\Expense;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ColocationController extends Controller
 {
@@ -62,17 +64,17 @@ class ColocationController extends Controller
             abort(403);
         }
 
-        // Filtres de mois et année
-        $month = $request->get('month', date('m'));
-        $year = $request->get('year', date('Y'));
+        // Filtres de mois et année (défaut : null pour "toutes les dates")
+        $month = $request->get('month');
+        $year = $request->get('year');
 
-        // Récupérer les dépenses filtrées
-        $expenses = $colocation->expenses()
-            ->with(['payer', 'category'])
-            ->whereMonth('date', $month)
-            ->whereYear('date', $year)
-            ->orderBy('date', 'desc')
-            ->get();
+        $query = $colocation->expenses()->with(['payer', 'category']);
+        
+        if ($month && $year) {
+            $query->whereMonth('date', $month)->whereYear('date', $year);
+        }
+        
+        $expenses = $query->orderBy('date', 'desc')->get();
 
         // Calculer les statistiques par catégorie
         $stats = $expenses->groupBy('category_id')->map(function ($group) {
@@ -84,44 +86,96 @@ class ColocationController extends Controller
             ];
         });
 
-        $totalMonthly = $expenses->sum('amount');
-        $memberCount = $colocation->members()->whereNull('left_at')->count();
-        $fairShare = $memberCount > 0 ? $totalMonthly / $memberCount : 0;
+        // Définir la plage de dates pour le calcul des membres historiques
+        if ($month && $year) {
+            $startRange = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $endRange = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        } else {
+            $startRange = Carbon::createFromTimestamp(0); // Depuis toujours
+            $endRange = Carbon::now()->addYears(10); // Jusqu'à l'infini (presque)
+        }
 
-        // Récupérer les règlements payés pour ce mois
-        $settlements = \App\Models\Settlement::where('colocation_id', $colocation->id)
-            ->where('month', $month)
-            ->where('year', $year)
-            ->where('status', 'paid')
+        // Récupérer les membres historiques
+        $historicalMembersRaw = $colocation->members()
+            ->where('colocation_user.created_at', '<=', $endRange)
+            ->where(function($query) use ($startRange) {
+                $query->whereNull('colocation_user.left_at')
+                      ->orWhere('colocation_user.left_at', '>=', $startRange);
+            })
             ->get();
+        
+        $historicalMembers = $historicalMembersRaw->groupBy('id');
 
-        // Calculer les balances individuelles
-        $balances = $colocation->members()->whereNull('left_at')->get()->map(function ($member) use ($expenses, $fairShare, $settlements) {
-            $paidByMember = $expenses->where('user_id', $member->id)->sum('amount');
-            
-            // Ce que le membre a reçu d'autres colocataires (en tant que créancier)
-            $received = $settlements->where('creditor_id', $member->id)->sum('amount');
-            // Ce que le membre a payé aux autres (en tant que débiteur)
-            $paidToOthers = $settlements->where('debtor_id', $member->id)->sum('amount');
+        // Calculer les balances basées sur la présence EFFECTIVE lors de chaque dépense
+        $balances = $historicalMembers->map(function ($memberPeriods) use ($expenses, $colocation) {
+            $member = $memberPeriods->first(); // On prend l'objet user de base
+            $totalPaid = $expenses->where('user_id', $member->id)->sum('amount');
+            $totalDebtShare = 0;
+
+            foreach ($expenses as $expense) {
+                $expenseDate = Carbon::parse($expense->date);
+                
+                // Compter les membres DISTINCTS présents au MOMENT de cette dépense précise
+                $presentCount = $colocation->members()
+                    ->where('colocation_user.created_at', '<=', $expenseDate->clone()->endOfDay())
+                    ->where(function($q) use ($expenseDate) {
+                        $q->whereNull('colocation_user.left_at')
+                          ->orWhere('colocation_user.left_at', '>=', $expenseDate->clone()->startOfDay());
+                    })
+                    ->distinct('users.id')
+                    ->count('users.id');
+
+                // Est-ce que cet utilisateur était là dans l'une de ses périodes ?
+                $wasPresent = false;
+                foreach ($memberPeriods as $period) {
+                    if (($period->pivot->created_at <= $expenseDate->clone()->endOfDay()) && 
+                        (is_null($period->pivot->left_at) || $period->pivot->left_at >= $expenseDate->clone()->startOfDay())) {
+                        $wasPresent = true;
+                        break;
+                    }
+                }
+
+                if ($wasPresent && $presentCount > 0) {
+                    $totalDebtShare += $expense->amount / $presentCount;
+                }
+            }
 
             return [
                 'user' => $member,
-                'paid' => $paidByMember, // Montant initial (dépenses)
-                'received' => $received,
-                'sent' => $paidToOthers,
-                'balance' => ($paidByMember - $fairShare) - $received + $paidToOthers,
+                'paid' => $totalPaid,
+                'debtShare' => $totalDebtShare,
             ];
         });
 
-        $colocation->load(['members' => function($query) {
-            $query->whereNull('left_at');
-        }]);
+        // Charger les règlements payés
+        $settlementQuery = \App\Models\Settlement::where('colocation_id', $colocation->id)
+            ->where('status', 'paid');
+            
+        if ($month && $year) {
+            $settlementQuery->where('month', (string)$month)->where('year', (string)$year);
+        }
         
-        $colocation->load(['members' => function($query) {
-            $query->whereNull('left_at');
-        }]);
+        $settlements = $settlementQuery->get();
+
+        // Finaliser le calcul (Intégration des règlements)
+        $balances = $balances->map(function ($b) use ($settlements) {
+            $received = $settlements->where('creditor_id', $b['user']->id)->sum('amount');
+            $sent = $settlements->where('debtor_id', $b['user']->id)->sum('amount');
+
+            return array_merge($b, [
+                'received' => $received,
+                'sent' => $sent,
+                'balance' => ($b['paid'] - $b['debtShare']) - $received + $sent,
+            ]);
+        });
+
+        $colocation->setRelation('members', $historicalMembersRaw->sortBy(function($m) {
+            return $m->pivot->left_at === null ? 0 : 1;
+        })->unique('id'));
         
         $categories = \App\Models\Category::all();
+        $totalMonthly = $expenses->sum('amount');
+        $fairShare = $historicalMembers->count() > 0 ? $totalMonthly / $historicalMembers->count() : 0;
 
         // Simplification des dettes (calculer qui doit à qui)
         $suggestedSettlements = $this->simplifyDebts($balances, $colocation->id);
@@ -200,6 +254,23 @@ class ColocationController extends Controller
 
         if ($balance < -0.01) {
             $user->decrement('reputation');
+
+            // Si ce n'est pas l'owner qui part (car l'owner ne peut partir que s'il est seul)
+            // On transfère sa dette à l'owner actuel
+            if (!$isOwner) {
+                $owner = $colocation->owner()->first();
+                if ($owner) {
+                    \App\Models\Settlement::create([
+                        'colocation_id' => $colocation->id,
+                        'debtor_id' => $user->id,
+                        'creditor_id' => $owner->id,
+                        'amount' => abs($balance),
+                        'month' => now()->month,
+                        'year' => now()->year,
+                        'status' => 'paid'
+                    ]);
+                }
+            }
         } else {
             $user->increment('reputation');
         }
@@ -209,7 +280,7 @@ class ColocationController extends Controller
 
         // Si c'était le dernier membre (donc le propriétaire), on désactive la coloc
         if ($isOwner) {
-            $colocation->update(['status' => 'inactive']);
+            $colocation->update(['status' => 'cancelled']);
         }
 
         return redirect()->route('dashboard')->with('success', 'Vous avez quitté la colocation.');
@@ -233,10 +304,25 @@ class ColocationController extends Controller
 
         if ($balance < -0.01) {
             $user->decrement('reputation');
-        } else {
+            
+            // Transfert de dette au propriétaire via un règlement interne
+            $debtAmount = abs($balance);
+            $owner = auth()->user();
+
+            \App\Models\Settlement::create([
+                'colocation_id' => $colocation->id,
+                'debtor_id' => $user->id,
+                'creditor_id' => $owner->id,
+                'amount' => $debtAmount,
+                'month' => now()->month,
+                'year' => now()->year,
+                'status' => 'paid'
+            ]);
+        } else if ($balance > 0.01) {
             $user->increment('reputation');
         }
 
+        // Marquer le départ définitif (pivot)
         $colocation->members()->updateExistingPivot($user->id, ['left_at' => now()]);
 
         return redirect()->back()->with('success', 'Membre retiré avec succès.');
@@ -268,11 +354,59 @@ class ColocationController extends Controller
 
     private function calculateMemberBalance(Colocation $colocation, $user)
     {
-        $expenses = $colocation->expenses()->whereMonth('date', now()->month)->get();
-        $memberCount = $colocation->members()->whereNull('left_at')->count();
-        $fairShare = $memberCount > 0 ? $expenses->sum('amount') / $memberCount : 0;
-        $paidByMember = $expenses->where('user_id', $user->id)->sum('amount');
+        $month = now()->month;
+        $year = now()->year;
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+
+        $expenses = $colocation->expenses()
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->get();
         
-        return $paidByMember - $fairShare;
+        $totalPaid = $expenses->where('user_id', $user->id)->sum('amount');
+        $totalDebtShare = 0;
+
+        foreach ($expenses as $expense) {
+            $expenseDate = Carbon::parse($expense->date);
+            
+            $presentCount = $colocation->members()
+                ->where('colocation_user.created_at', '<=', $expenseDate->clone()->endOfDay())
+                ->where(function($q) use ($expenseDate) {
+                    $q->whereNull('colocation_user.left_at')
+                      ->orWhere('colocation_user.left_at', '>=', $expenseDate->clone()->startOfDay());
+                })
+                ->distinct('users.id')
+                ->count('users.id');
+
+            // Retrouver toutes les périodes de membership cet utilisateur
+            $memberships = $colocation->members()
+                ->where('users.id', $user->id)
+                ->get();
+
+            $wasPresent = false;
+            foreach ($memberships as $membership) {
+                if (($membership->pivot->created_at <= $expenseDate->clone()->endOfDay()) && 
+                    (is_null($membership->pivot->left_at) || $membership->pivot->left_at >= $expenseDate->clone()->startOfDay())) {
+                    $wasPresent = true;
+                    break;
+                }
+            }
+
+            if ($wasPresent && $presentCount > 0) {
+                $totalDebtShare += $expense->amount / $presentCount;
+            }
+        }
+        
+        $settlements = \App\Models\Settlement::where('colocation_id', $colocation->id)
+            ->where('month', (string)$month)
+            ->where('year', (string)$year)
+            ->where('status', 'paid')
+            ->get();
+
+        $received = $settlements->where('creditor_id', $user->id)->sum('amount');
+        $sent = $settlements->where('debtor_id', $user->id)->sum('amount');
+
+        return ($totalPaid - $totalDebtShare) - $received + $sent;
     }
 }
