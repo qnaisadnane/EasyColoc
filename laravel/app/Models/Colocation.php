@@ -30,11 +30,6 @@ class Colocation extends Model
         return $this->hasMany(Expense::class);
     }
 
-    public function tasks()
-    {
-        return $this->hasMany(Task::class);
-    }
-
     public function shoppingItems()
     {
         return $this->hasMany(ShoppingItem::class);

@@ -4,9 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ShoppingItem extends Model
+class Membership extends Model
 {
-    protected $fillable = ['colocation_id', 'user_id', 'name', 'quantity', 'is_bought'];
+    protected $fillable = ['colocation_id', 'user_id', 'role', 'join', 'left'];
+
+    protected $casts = [
+        'join' => 'datetime',
+        'left' => 'datetime',
+    ];
 
     public function colocation()
     {

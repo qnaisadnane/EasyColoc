@@ -70,7 +70,8 @@ class ColocationController extends Controller
 
         $query = $colocation->expenses()->with(['payer', 'category']);
         
-        if ($month && $year) {
+        if ($month) {
+            $year = $year ?: date('Y');
             $query->whereMonth('date', $month)->whereYear('date', $year);
         }
         
@@ -87,7 +88,8 @@ class ColocationController extends Controller
         });
 
         // Définir la plage de dates pour le calcul des membres historiques
-        if ($month && $year) {
+        if ($month) {
+            $year = $year ?: date('Y');
             $startRange = Carbon::createFromDate($year, $month, 1)->startOfMonth();
             $endRange = Carbon::createFromDate($year, $month, 1)->endOfMonth();
         } else {
