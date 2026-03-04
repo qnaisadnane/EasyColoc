@@ -22,7 +22,7 @@
                 <x-input-label for="password" :value="__('MOT DE PASSE')" class="text-[10px] font-black tracking-[0.2em] text-slate-500" />
                 @if (Route::has('password.request'))
                     <a class="text-[10px] font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest transition-colors" href="{{ route('password.request') }}">
-                        Oublié ?
+                        Oublie ?
                     </a>
                 @endif
             </div>
@@ -40,7 +40,7 @@
         <div class="flex items-center">
             <label for="remember_me" class="inline-flex items-center cursor-pointer group">
                 <input id="remember_me" type="checkbox" class="rounded-lg bg-slate-900 border-white/10 text-indigo-600 shadow-sm focus:ring-indigo-500/20 w-5 h-5 transition-all group-hover:border-indigo-500/50" name="remember">
-                <span class="ms-3 text-sm font-bold text-slate-500 group-hover:text-slate-300 transition-colors uppercase tracking-widest">{{ __('Rester connecté') }}</span>
+                <span class="ms-3 text-sm font-bold text-slate-500 group-hover:text-slate-300 transition-colors uppercase tracking-widest">{{ __('Rester connecte') }}</span>
             </label>
         </div>
 
@@ -53,7 +53,7 @@
         <div class="mt-8 text-center border-t border-white/5 pt-8">
             <p class="text-sm text-slate-500 font-medium">
                 Nouveau ici ? 
-                <a href="{{ route('register') }}" class="text-indigo-400 font-bold hover:text-indigo-300 transition-colors ml-1">Créer un compte</a>
+                <a href="{{ route('register') }}" class="text-indigo-400 font-bold hover:text-indigo-300 transition-colors ml-1">Creer un compte</a>
             </p>
         </div>
     </form>

@@ -3,9 +3,9 @@
         <div class="relative py-4">
             <div class="absolute -left-4 top-0 h-16 w-1 bg-indigo-500 rounded-full shadow-[0_0_20px_rgba(99,102,241,0.5)]"></div>
             <h2 class="font-black text-5xl text-white tracking-tighter">
-                {{ __('Mes Colos') }}
+                {{ __('Mes Colocations') }}
             </h2>
-            <p class="text-slate-400 mt-2 font-medium">L'épicentre de votre vie partagée.</p>
+            <p class="text-slate-400 mt-2 font-medium">L'epicentre de votre vie partagee.</p>
         </div>
     </x-slot>
 
@@ -55,14 +55,14 @@
                         </div>
                         
                         <h3 class="text-4xl md:text-5xl font-black text-white mb-6 tracking-tighter">Votre futur chez-vous <br class="hidden md:block"> commence ici.</h3>
-                        <p class="text-slate-400 max-w-lg mx-auto mb-14 leading-relaxed text-lg font-medium">Créez votre première colocation et révolutionnez la gestion de vos dépenses communes avec style.</p>
+                        <p class="text-slate-400 max-w-lg mx-auto mb-14 leading-relaxed text-lg font-medium">Creez votre première colocation et revolutionnez la gestion de vos depenses communes avec style.</p>
                         
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
                             <a href="{{ route('colocations.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 bg-indigo-600 hover:bg-indigo-500 text-white text-lg font-black rounded-2xl shadow-[0_0_30px_-5px_rgba(99,102,241,0.5)] transition-all transform hover:-translate-y-1 active:scale-95">
                                 <svg class="-ml-1 mr-3 h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                                 </svg>
-                                Créer une colocation
+                                Creer une colocation
                             </a>
                         </div>
                     </div>

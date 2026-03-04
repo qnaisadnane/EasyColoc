@@ -11,9 +11,9 @@ return new class extends Migration
     {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('colocation_id')->constrained()->onDelete('cascade');
             $table->string('email');
             $table->string('token')->unique();
-            $table->foreignId('colocation_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['pending', 'accepted', 'declined'])->default('pending');
             $table->timestamps();
         });

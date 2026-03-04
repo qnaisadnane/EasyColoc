@@ -48,13 +48,13 @@
 
         <div class="pt-4">
             <x-primary-button class="w-full py-4 text-lg">
-                {{ __('Créer mon compte') }}
+                {{ __('Creer mon compte') }}
             </x-primary-button>
         </div>
 
         <div class="mt-8 text-center border-t border-white/5 pt-8">
             <p class="text-sm text-slate-500 font-medium">
-                Déjà inscrit ? 
+                Deja inscrit ? 
                 <a href="{{ route('login') }}" class="text-indigo-400 font-bold hover:text-indigo-300 transition-colors ml-1">Se connecter</a>
             </p>
         </div>

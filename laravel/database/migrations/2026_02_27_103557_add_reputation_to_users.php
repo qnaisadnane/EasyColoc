@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('depenses', function (Blueprint $table) {
-            $table->id();
-            $table->string('titre');
-            $table->decimal('montant' , 8,2);
-            $table->DateTime('date_depense');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('reputation')->default(0);
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('depenses');
+        Schema::table('users', function (Blueprint $table) {
+            //
+        });
     }
 };
