@@ -5,7 +5,6 @@
             <h2 class="font-black text-5xl text-white tracking-tighter">
                 {{ __('Mes Colocations') }}
             </h2>
-            <p class="text-slate-400 mt-2 font-medium">L'epicentre de votre vie partagee.</p>
         </div>
     </x-slot>
 
@@ -48,13 +47,8 @@
                     <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/5 to-fuchsia-600/5 opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
                     
                     <div class="relative z-10">
-                        <div class="inline-flex h-32 w-32 items-center justify-center rounded-[2.5rem] bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 mb-12 transform transition-all duration-700 group-hover:rotate-[360deg] group-hover:scale-110 shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)]">
-                            <svg class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                        </div>
                         
-                        <h3 class="text-4xl md:text-5xl font-black text-white mb-6 tracking-tighter">Votre futur chez-vous <br class="hidden md:block"> commence ici.</h3>
+                        <h3 class="text-4xl md:text-5xl font-black text-white mb-6 tracking-tighter">Ajouter Une colocation <br class="hidden md:block"></h3>
                         <p class="text-slate-400 max-w-lg mx-auto mb-14 leading-relaxed text-lg font-medium">Creez votre première colocation et revolutionnez la gestion de vos depenses communes avec style.</p>
                         
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-6">

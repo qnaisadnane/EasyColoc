@@ -106,7 +106,7 @@
                                             </div>
                                         </div>
                                         <div class="text-right flex items-center space-x-6">
-                                            <p class="text-2xl font-black text-white tracking-tighter">{{ number_format($expense->amount, 2) }}€</p>
+                                            <p class="text-2xl font-black text-white tracking-tighter">{{ number_format($expense->amount, 2) }}MAD</p>
                                             
                                             @if(auth()->id() === $expense->user_id)
                                                 <form action="{{ route('depenses.destroy', $expense) }}" method="POST" onsubmit="return confirm('Supprimer cette depense ?')">
@@ -136,21 +136,13 @@
                                 <div class="p-5 rounded-[2rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-3">
-                                            <div class="flex -space-x-3">
-                                                <div class="h-10 w-10 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-xs font-black text-rose-400" title="Doit payer">
-                                                    {{ substr($suggested['debtor']->name, 0, 1) }}
-                                                </div>
-                                                <div class="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-black text-emerald-400 z-10" title="Reçoit le paiement">
-                                                    {{ substr($suggested['creditor']->name, 0, 1) }}
-                                                </div>
-                                            </div>
                                             <div>
                                                 <p class="text-[11px] font-black text-white leading-tight">
                                                     <span class="text-rose-400 uppercase">{{ $suggested['debtor']->name }}</span>
                                                     <span class="text-slate-500 mx-1">→</span>
                                                     <span class="text-emerald-400 uppercase">{{ $suggested['creditor']->name }}</span>
                                                 </p>
-                                                <p class="text-[15px] font-black text-white tracking-tighter mt-1">{{ number_format($suggested['amount'], 2) }}€</p>
+                                                <p class="text-[15px] font-black text-white tracking-tighter mt-1">{{ number_format($suggested['amount'], 2) }}MAD</p>
                                             </div>
                                         </div>
 
@@ -196,13 +188,13 @@
                                             </div>
                                             <div>
                                                 <p class="text-xs font-black text-white uppercase">{{ $balance['user']->name }}</p>
-                                                <p class="text-[9px] font-bold text-slate-500">Paye: {{ number_format($balance['paid'], 2) }}€</p>
+                                                <p class="text-[9px] font-bold text-slate-500">Paye: {{ number_format($balance['paid'], 2) }}MAD</p>
                                             </div>
                                         </div>
                                         <div class="text-right">
                                             <div class="flex flex-col items-end">
                                                 <p class="text-sm font-black {{ $balance['balance'] >= 0.01 ? 'text-emerald-400' : ($balance['balance'] <= -0.01 ? 'text-rose-400' : 'text-slate-500') }}">
-                                                    {{ $balance['balance'] >= 0.01 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}€
+                                                    {{ $balance['balance'] >= 0.01 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}MAD
                                                 </p>
                                                 <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                                                     {{ $balance['balance'] >= 0.01 ? 'À RECEVOIR' : ($balance['balance'] <= -0.01 ? 'À PAYER' : 'eQUILIBRe') }}
@@ -279,7 +271,7 @@
                     @csrf
                     <div><x-input-label for="description" :value="__('DESCRIPTION')" /><x-text-input id="description" name="description" type="text" class="block w-full" required /></div>
                     <div class="grid grid-cols-2 gap-6">
-                        <div><x-input-label for="amount" :value="__('MONTANT (€)')" /><x-text-input id="amount" name="amount" type="number" step="0.01" class="block w-full" required /></div>
+                        <div><x-input-label for="amount" :value="__('MONTANT (MAD)')" /><x-text-input id="amount" name="amount" type="number" step="0.01" class="block w-full" required /></div>
                         <div><x-input-label for="date" :value="__('DATE')" /><x-text-input id="date" name="date" type="date" class="block w-full" value="{{ date('Y-m-d') }}" required /></div>
                     </div>
                     <div><x-input-label for="category_id" :value="__('CATeGORIE')" /><select name="category_id" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold">@foreach($categories as $category)<option value="{{ $category->id }}">{{ $category->name }}</option>@endforeach</select></div>

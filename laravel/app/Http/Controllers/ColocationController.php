@@ -253,22 +253,27 @@ class ColocationController extends Controller
         // Calculer le solde avant de partir pour la reputation
         $balance = $this->calculateMemberBalance($colocation, $user);
 
-        if ($balance < -0.01) {
-            $user->decrement('reputation');
+        if (abs($balance) > 0.01) {
+            if ($balance < -0.01) {
+                $user->decrement('reputation');
+            } else {
+                $user->increment('reputation');
+            }
 
             // Si ce n'est pas l'owner qui part (car l'owner ne peut partir que s'il est seul)
-            // On transfere sa dette a l'owner actuel
+            // On transfere son solde (positif ou negatif) a l'owner actuel pour equilibrer
             if (!$isOwner) {
                 $owner = $colocation->owner()->first();
                 if ($owner) {
                     \App\Models\Settlement::create([
                         'colocation_id' => $colocation->id,
-                        'debtor_id' => $user->id,
-                        'creditor_id' => $owner->id,
+                        'debtor_id' => $balance < 0 ? $user->id : $owner->id,
+                        'creditor_id' => $balance < 0 ? $owner->id : $user->id,
                         'amount' => abs($balance),
                         'month' => now()->month,
                         'year' => now()->year,
-                        'status' => 'paid'
+                        'status' => 'paid',
+                        'paid_at' => now()
                     ]);
                 }
             }
@@ -303,23 +308,27 @@ class ColocationController extends Controller
         // Calculer le solde avant l'exclusion
         $balance = $this->calculateMemberBalance($colocation, $user);
 
-        if ($balance < -0.01) {
-            $user->decrement('reputation');
+        if (abs($balance) > 0.01) {
+            if ($balance < -0.01) {
+                $user->decrement('reputation');
+            } else {
+                $user->increment('reputation');
+            }
             
-            // Transfert de dette au proprietaire via un reglement interne
-            $debtAmount = abs($balance);
+            // Transfert du solde (positif ou negatif) au proprietaire
             $owner = auth()->user();
 
             \App\Models\Settlement::create([
                 'colocation_id' => $colocation->id,
-                'debtor_id' => $user->id,
-                'creditor_id' => $owner->id,
-                'amount' => $debtAmount,
+                'debtor_id' => $balance < 0 ? $user->id : $owner->id,
+                'creditor_id' => $balance < 0 ? $owner->id : $user->id,
+                'amount' => abs($balance),
                 'month' => now()->month,
                 'year' => now()->year,
-                'status' => 'paid'
+                'status' => 'paid',
+                'paid_at' => now()
             ]);
-        } else if ($balance > 0.01) {
+        } else {
             $user->increment('reputation');
         }
 

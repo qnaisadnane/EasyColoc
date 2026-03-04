@@ -4,10 +4,7 @@
             <h2 class="text-3xl font-black text-white uppercase tracking-tighter">
                 Admin <span class="text-indigo-400">Control Center</span>
             </h2>
-            <div class="flex items-center space-x-3 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30">
-                <span class="flex h-2 w-2 rounded-full bg-indigo-500 animate-ping"></span>
-                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-300">Système Live</span>
-            </div>
+            
         </div>
     </x-slot>
 
@@ -39,7 +36,7 @@
                 <div xl-glass class="p-8 rounded-[2.5rem] border border-white/10 relative overflow-hidden group">
                     <div class="absolute -top-12 -right-12 h-32 w-32 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all"></div>
                     <p class="text-[10px) font-black text-slate-500 uppercase tracking-widest mb-2">Flux Financier</p>
-                    <h3 class="text-4xl font-black text-white">{{ number_format($stats['total_expenses'], 2) }} €</h3>
+                    <h3 class="text-4xl font-black text-white">{{ number_format($stats['total_expenses'], 2) }} MAD</h3>
                     <p class="text-[10px] font-bold text-emerald-400 mt-4 uppercase tracking-widest">Dépenses cumulées</p>
                 </div>
 
@@ -128,8 +125,7 @@
             <div xl-glass class="rounded-[3rem] border border-white/10 overflow-hidden">
                 <div class="p-8 border-b border-white/10 flex items-center justify-between">
                     <div>
-                        <h3 class="text-xl font-black text-white uppercase tracking-tighter">Rubriques de Dépenses</h3>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Gérer les catégories globales</p>
+                        <h3 class="text-xl font-black text-white uppercase tracking-tighter">Gestion des catégories</h3>
                     </div>
                     <button @click="openCategoryModal = true" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-lg shadow-indigo-600/20 active:scale-95 text-[10px] uppercase tracking-widest">
                         + NOUVELLE CATÉGORIE
@@ -166,7 +162,7 @@
                                             {{ $category->expenses_count ?? 0 }} DEPENSES
                                         </span>
                                         <span class="text-[11px] font-black text-emerald-400 ml-1">
-                                            {{ number_format($category->expenses_sum_amount ?? 0, 2) }} €
+                                            {{ number_format($category->expenses_sum_amount ?? 0, 2) }} MAD
                                         </span>
                                     </div>
                                 </td>

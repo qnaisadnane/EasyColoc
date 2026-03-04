@@ -91,7 +91,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <p class="text-slate-500 font-bold uppercase tracking-tighter">Tout est calme dans la nébuleuse.</p>
                         </div>
                     </div>
                 </div>
@@ -109,16 +108,7 @@
                             <p class="text-fuchsia-400 text-[10px] font-black uppercase tracking-widest mt-2">Utilisateur Vérifié</p>
                         </div>
                         
-                        <div class="mt-10 pt-10 border-t border-white/5 grid grid-cols-2 gap-4">
-                            <div class="text-center">
-                                <p class="text-2xl font-black text-white">0</p>
-                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-1">Colos</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-2xl font-black text-white">€0</p>
-                                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-1">Dépenses</p>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
