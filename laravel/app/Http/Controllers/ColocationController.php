@@ -27,7 +27,7 @@ class ColocationController extends Controller
     public function create()
     {
         if (auth()->user()->activeColocation()) {
-            return redirect()->route('colocations.index')->with('error', 'Vous appartenez déjà à une colocation active.');
+            return redirect()->route('colocations.index')->with('error', 'Vous appartenez deja a une colocation active.');
         }
 
         return view('colocations.create');
@@ -37,7 +37,7 @@ class ColocationController extends Controller
     public function store(Request $request)
     {
         if (auth()->user()->activeColocation()) {
-            return redirect()->back()->withErrors(['name' => 'Vous avez déjà une colocation active.']);
+            return redirect()->back()->withErrors(['name' => 'Vous avez deja une colocation active.']);
         }
 
         $request->validate([
@@ -51,20 +51,20 @@ class ColocationController extends Controller
 
         $colocation->members()->attach(auth()->id(), ['role' => 'owner']);
 
-        return redirect()->route('colocations.show', $colocation)->with('success', 'Colocation créée avec succès !');
+        return redirect()->route('colocations.show', $colocation)->with('success', 'Colocation creee avec succes !');
     }
 
     
     public function show(Request $request, Colocation $colocation)
     {
-        // Vérifier si l'utilisateur est membre actif
+        // Verifier si l'utilisateur est membre actif
         $membership = $colocation->members()->where('user_id', auth()->id())->whereNull('left_at')->first();
         
         if (!$membership) {
             abort(403);
         }
 
-        // Filtres de mois et année (défaut : null pour "toutes les dates")
+        // Filtres de mois et annee (defaut : null pour "toutes les dates")
         $month = $request->get('month');
         $year = $request->get('year');
 
@@ -77,27 +77,26 @@ class ColocationController extends Controller
         
         $expenses = $query->orderBy('date', 'desc')->get();
 
-        // Calculer les statistiques par catégorie
+        // Calculer les statistiques par categorie
         $stats = $expenses->groupBy('category_id')->map(function ($group) {
             return [
                 'name' => $group->first()->category->name,
                 'total' => $group->sum('amount'),
                 'color' => $group->first()->category->color,
-                'icon' => $group->first()->category->icon,
             ];
         });
 
-        // Définir la plage de dates pour le calcul des membres historiques
+        // Definir la plage de dates pour le calcul des membres historiques
         if ($month) {
             $year = $year ?: date('Y');
             $startRange = Carbon::createFromDate($year, $month, 1)->startOfMonth();
             $endRange = Carbon::createFromDate($year, $month, 1)->endOfMonth();
         } else {
-            $startRange = Carbon::createFromTimestamp(0); // Depuis toujours
-            $endRange = Carbon::now()->addYears(10); // Jusqu'à l'infini (presque)
+            $startRange = Carbon::createFromTimestamp(0); 
+            $endRange = Carbon::now()->addYears(10); 
         }
 
-        // Récupérer les membres historiques
+        // Recuperer les membres historiques
         $historicalMembersRaw = $colocation->members()
             ->where('colocation_user.created_at', '<=', $endRange)
             ->where(function($query) use ($startRange) {
@@ -108,7 +107,7 @@ class ColocationController extends Controller
         
         $historicalMembers = $historicalMembersRaw->groupBy('id');
 
-        // Calculer les balances basées sur la présence EFFECTIVE lors de chaque dépense
+        // Calculer les balances basees sur la presence EFFECTIVE lors de chaque depense
         $balances = $historicalMembers->map(function ($memberPeriods) use ($expenses, $colocation) {
             $member = $memberPeriods->first(); // On prend l'objet user de base
             $totalPaid = $expenses->where('user_id', $member->id)->sum('amount');
@@ -117,7 +116,7 @@ class ColocationController extends Controller
             foreach ($expenses as $expense) {
                 $expenseDate = Carbon::parse($expense->date);
                 
-                // Compter les membres DISTINCTS présents au MOMENT de cette dépense précise
+                // Compter les membres DISTINCTS presents au MOMENT de cette depense precise
                 $presentCount = $colocation->members()
                     ->where('colocation_user.created_at', '<=', $expenseDate->clone()->endOfDay())
                     ->where(function($q) use ($expenseDate) {
@@ -127,7 +126,7 @@ class ColocationController extends Controller
                     ->distinct('users.id')
                     ->count('users.id');
 
-                // Est-ce que cet utilisateur était là dans l'une de ses périodes ?
+                // Est-ce que cet utilisateur etait la dans l'une de ses periodes ?
                 $wasPresent = false;
                 foreach ($memberPeriods as $period) {
                     if (($period->pivot->created_at <= $expenseDate->clone()->endOfDay()) && 
@@ -149,7 +148,7 @@ class ColocationController extends Controller
             ];
         });
 
-        // Charger les règlements payés
+        // Charger les reglements payes
         $settlementQuery = \App\Models\Settlement::where('colocation_id', $colocation->id)
             ->where('status', 'paid');
             
@@ -159,7 +158,7 @@ class ColocationController extends Controller
         
         $settlements = $settlementQuery->get();
 
-        // Finaliser le calcul (Intégration des règlements)
+        // Finaliser le calcul (Integration des reglements)
         $balances = $balances->map(function ($b) use ($settlements) {
             $received = $settlements->where('creditor_id', $b['user']->id)->sum('amount');
             $sent = $settlements->where('debtor_id', $b['user']->id)->sum('amount');
@@ -179,7 +178,7 @@ class ColocationController extends Controller
         $totalMonthly = $expenses->sum('amount');
         $fairShare = $historicalMembers->count() > 0 ? $totalMonthly / $historicalMembers->count() : 0;
 
-        // Simplification des dettes (calculer qui doit à qui)
+        // Simplification des dettes (calculer qui doit a qui)
         $suggestedSettlements = $this->simplifyDebts($balances, $colocation->id);
 
         return view('colocations.show', compact(
@@ -246,19 +245,19 @@ class ColocationController extends Controller
         $activeMembers = $colocation->members()->whereNull('left_at')->get();
         $isOwner = $colocation->owner->contains($user);
 
-        // Si c'est le propriétaire et qu'il y a d'autres membres
+        // Si c'est le proprietaire et qu'il y a d'autres membres
         if ($isOwner && $activeMembers->count() > 1) {
-            return redirect()->back()->with('error', 'En tant que propriétaire, vous devez retirer tous les autres membres avant de pouvoir quitter et fermer la colocation.');
+            return redirect()->back()->with('error', 'En tant que proprietaire, vous devez retirer tous les autres membres avant de pouvoir quitter et fermer la colocation.');
         }
 
-        // Calculer le solde avant de partir pour la réputation
+        // Calculer le solde avant de partir pour la reputation
         $balance = $this->calculateMemberBalance($colocation, $user);
 
         if ($balance < -0.01) {
             $user->decrement('reputation');
 
             // Si ce n'est pas l'owner qui part (car l'owner ne peut partir que s'il est seul)
-            // On transfère sa dette à l'owner actuel
+            // On transfere sa dette a l'owner actuel
             if (!$isOwner) {
                 $owner = $colocation->owner()->first();
                 if ($owner) {
@@ -277,15 +276,15 @@ class ColocationController extends Controller
             $user->increment('reputation');
         }
 
-        // Marquer le départ
+        // Marquer le depart
         $colocation->members()->updateExistingPivot($user->id, ['left_at' => now()]);
 
-        // Si c'était le dernier membre (donc le propriétaire), on désactive la coloc
+        // Si c'etait le dernier membre (donc le proprietaire), on desactive la coloc
         if ($isOwner) {
             $colocation->update(['status' => 'cancelled']);
         }
 
-        return redirect()->route('dashboard')->with('success', 'Vous avez quitté la colocation.');
+        return redirect()->route('dashboard')->with('success', 'Vous avez quitte la colocation.');
     }
 
     /**
@@ -307,7 +306,7 @@ class ColocationController extends Controller
         if ($balance < -0.01) {
             $user->decrement('reputation');
             
-            // Transfert de dette au propriétaire via un règlement interne
+            // Transfert de dette au proprietaire via un reglement interne
             $debtAmount = abs($balance);
             $owner = auth()->user();
 
@@ -324,10 +323,10 @@ class ColocationController extends Controller
             $user->increment('reputation');
         }
 
-        // Marquer le départ définitif (pivot)
+        // Marquer le depart definitif (pivot)
         $colocation->members()->updateExistingPivot($user->id, ['left_at' => now()]);
 
-        return redirect()->back()->with('success', 'Membre retiré avec succès.');
+        return redirect()->back()->with('success', 'Membre retire avec succes.');
     }
 
     /**
@@ -381,7 +380,7 @@ class ColocationController extends Controller
                 ->distinct('users.id')
                 ->count('users.id');
 
-            // Retrouver toutes les périodes de membership cet utilisateur
+            // Retrouver toutes les periodes de membership cet utilisateur
             $memberships = $colocation->members()
                 ->where('users.id', $user->id)
                 ->get();

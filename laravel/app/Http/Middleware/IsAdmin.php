@@ -19,6 +19,6 @@ class IsAdmin
             return $next($request);
         }
 
-        abort(403, 'Accès réservé aux administrateurs globaux.');
+        abort(403, 'Acces reserve aux administrateurs globaux.');
     }
 }

@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/invitations/{invitation}/decline', [\App\Http\Controllers\InvitationController::class, 'decline'])->name('invitations.decline');
     Route::post('/colocations/{colocation}/settlements', [\App\Http\Controllers\SettlementController::class, 'store'])->name('settlements.store');
     
-    // Dépenses
+    // Depenses
     Route::post('/colocations/{colocation}/expenses', [\App\Http\Controllers\DepenseController::class, 'store'])->name('depenses.store');
     Route::patch('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'update'])->name('depenses.update');
     Route::delete('/expenses/{expense}', [\App\Http\Controllers\DepenseController::class, 'destroy'])->name('depenses.destroy');
@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [\App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
         Route::post('/users/{user}/toggle-ban', [\App\Http\Controllers\AdminController::class, 'toggleBan'])->name('admin.users.ban');
         
-        // Catégories
+        // Categories
         Route::post('/categories', [\App\Http\Controllers\AdminController::class, 'storeCategory'])->name('admin.categories.store');
         Route::patch('/categories/{category}', [\App\Http\Controllers\AdminController::class, 'updateCategory'])->name('admin.categories.update');
         Route::delete('/categories/{category}', [\App\Http\Controllers\AdminController::class, 'destroyCategory'])->name('admin.categories.destroy');

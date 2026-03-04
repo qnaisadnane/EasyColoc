@@ -74,15 +74,15 @@
                     </h1>
 
                     <p class="text-xl text-slate-400 max-w-xl font-medium leading-relaxed">
-                        EasyColoc centralise vos dépenses dans une interface crystal-clear. Équilibrez les comptes instantanément.
+                        EasyColoc centralise vos depenses dans une interface crystal-clear. equilibrez les comptes instantanement.
                     </p>
 
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 pt-6">
                         <a href="{{ route('register') }}" class="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(99,102,241,0.5)] active:scale-95 uppercase tracking-widest text-sm">
-                            Créer ma coloc
+                            Creer ma coloc
                         </a>
                         <a href="#features" class="w-full sm:w-auto px-10 py-5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black rounded-2xl transition-all active:scale-95 uppercase tracking-widest text-sm">
-                            Voir les fonctionnalités
+                            Voir les fonctionnalites
                         </a>
                     </div>
 
@@ -114,7 +114,7 @@
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-32 space-y-6">
                     <h2 class="text-5xl font-black tracking-tight text-white uppercase">Tout ce dont vous avez besoin</h2>
-                    <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Une suite d'outils pensée pour la vie à plusieurs et le règlement des dépenses.</p>
+                    <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Une suite d'outils pensee pour la vie à plusieurs et le règlement des depenses.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -126,7 +126,7 @@
                             </svg>
                         </div>
                         <h4 class="text-2xl font-black text-white mb-4 uppercase tracking-tight">Comptes Justes</h4>
-                        <p class="text-slate-500 font-medium">Fini les calculs interminables. Saisissez vos dépenses et laissez EasyColoc équilibrer les balances en temps réel.</p>
+                        <p class="text-slate-500 font-medium">Fini les calculs interminables. Saisissez vos depenses et laissez EasyColoc equilibrer les balances en temps reel.</p>
                     </div>
 
                 </div>
@@ -139,7 +139,7 @@
                 <div class="flex items-center space-x-3">
                     <span class="text-lg font-black tracking-tighter uppercase whitespace-nowrap text-slate-500">Easy<span class="text-indigo-400/50">Coloc</span></span>
                 </div>
-                <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">&copy; 2026 EasyColoc Inc. Façonné avec soin pour les colocs.</p>
+                <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">&copy; 2026 EasyColoc Inc. Façonne avec soin pour les colocs.</p>
                 <div class="flex items-center space-x-6">
                     <a href="#" class="text-xs font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">Twitter</a>
                     <a href="#" class="text-xs font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors">GitHub</a>

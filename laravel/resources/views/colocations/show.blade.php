@@ -19,7 +19,7 @@
                              {{ $colocation->members->count() }} CO-LOCATAIRES
                         </span>
                         <span class="h-1.5 w-1.5 rounded-full bg-slate-800"></span>
-                        <span>QUARTIER GÉNÉRAL</span>
+                        <span>QUARTIER GeNeRAL</span>
                     </div>
                 </div>
             </div>
@@ -63,13 +63,13 @@
     <div class="py-12" x-data="{ openExpenseModal: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                <!-- Flux de Dépenses -->
+                <!-- Flux de Depenses -->
                 <div class="lg:col-span-8 space-y-10">
                     <div xl-glass class="p-10 rounded-[3rem] relative overflow-hidden group min-h-[500px]">
                         <div class="flex items-center justify-between mb-10 relative z-10">
-                            <h3 class="text-2xl font-black text-white tracking-tight">Flux de dépenses</h3>
+                            <h3 class="text-2xl font-black text-white tracking-tight">Flux de depenses</h3>
                             <button @click="openExpenseModal = true" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-lg shadow-indigo-600/20 active:scale-95 text-xs uppercase tracking-widest">
-                                + NOUVELLE DÉPENSE
+                                + NOUVELLE DePENSE
                             </button>
                         </div>
                         
@@ -81,7 +81,7 @@
                                     </svg>
                                 </div>
                                 <p class="text-slate-400 font-bold text-xl mb-2">Le calme plat...</p>
-                                <p class="text-slate-500 text-sm font-medium">Aucune dépense en {{ Carbon\Carbon::create()->month((int) $month)->translatedFormat('F') }}.</p>
+                                <p class="text-slate-500 text-sm font-medium">Aucune depense en {{ Carbon\Carbon::create()->month((int) $month)->translatedFormat('F') }}.</p>
                             </div>
                         @else
                             <div class="space-y-4 relative z-10">
@@ -109,7 +109,7 @@
                                             <p class="text-2xl font-black text-white tracking-tighter">{{ number_format($expense->amount, 2) }}€</p>
                                             
                                             @if(auth()->id() === $expense->user_id)
-                                                <form action="{{ route('depenses.destroy', $expense) }}" method="POST" onsubmit="return confirm('Supprimer cette dépense ?')">
+                                                <form action="{{ route('depenses.destroy', $expense) }}" method="POST" onsubmit="return confirm('Supprimer cette depense ?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="p-2 text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover/item:opacity-100">
@@ -163,7 +163,7 @@
                                                 <input type="hidden" name="month" value="{{ $month }}">
                                                 <input type="hidden" name="year" value="{{ $year }}">
                                                 <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-emerald-600/20">
-                                                    Confirmé
+                                                    Confirme
                                                 </button>
                                             </form>
                                         @endif
@@ -196,7 +196,7 @@
                                             </div>
                                             <div>
                                                 <p class="text-xs font-black text-white uppercase">{{ $balance['user']->name }}</p>
-                                                <p class="text-[9px] font-bold text-slate-500">Payé: {{ number_format($balance['paid'], 2) }}€</p>
+                                                <p class="text-[9px] font-bold text-slate-500">Paye: {{ number_format($balance['paid'], 2) }}€</p>
                                             </div>
                                         </div>
                                         <div class="text-right">
@@ -205,7 +205,7 @@
                                                     {{ $balance['balance'] >= 0.01 ? '+' : '' }}{{ number_format($balance['balance'], 2) }}€
                                                 </p>
                                                 <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-                                                    {{ $balance['balance'] >= 0.01 ? 'À RECEVOIR' : ($balance['balance'] <= -0.01 ? 'À PAYER' : 'ÉQUILIBRÉ') }}
+                                                    {{ $balance['balance'] >= 0.01 ? 'À RECEVOIR' : ($balance['balance'] <= -0.01 ? 'À PAYER' : 'eQUILIBRe') }}
                                                 </p>
                                             </div>
                                         </div>
@@ -215,7 +215,7 @@
                         </div>
                         
                         <div class="mt-8 pt-8 border-t border-white/5">
-                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center italic">Calcul des parts par dépense</p>
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center italic">Calcul des parts par depense</p>
                         </div>
                     </div>
 
@@ -239,7 +239,7 @@
                                                     {{ $member->reputation > 0 ? '+' : '' }}{{ $member->reputation }}
                                                 </span>
                                             </p>
-                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{{ $member->pivot->role === 'owner' ? 'Propriétaire' : 'Colocataire' }}</p>
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{{ $member->pivot->role === 'owner' ? 'Proprietaire' : 'Colocataire' }}</p>
                                         </div>
                                     </div>
 
@@ -270,11 +270,11 @@
         </div>
 
         <!-- Modals -->
-        <!-- Modal Dépense (Déjà là) -->
+        <!-- Modal Depense (Dejà là) -->
         <div x-show="openExpenseModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" x-cloak>
             <div xl-glass class="w-full max-w-lg p-10 rounded-[3rem] border border-white/10 shadow-2xl relative" @click.away="openExpenseModal = false">
                 <button @click="openExpenseModal = false" class="absolute top-8 right-8 text-slate-500 hover:text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
-                <h3 class="text-3xl font-black text-white tracking-tighter mb-8 uppercase">Nouvelle Dépense</h3>
+                <h3 class="text-3xl font-black text-white tracking-tighter mb-8 uppercase">Nouvelle Depense</h3>
                 <form action="{{ route('depenses.store', $colocation) }}" method="POST" class="space-y-6">
                     @csrf
                     <div><x-input-label for="description" :value="__('DESCRIPTION')" /><x-text-input id="description" name="description" type="text" class="block w-full" required /></div>
@@ -282,7 +282,7 @@
                         <div><x-input-label for="amount" :value="__('MONTANT (€)')" /><x-text-input id="amount" name="amount" type="number" step="0.01" class="block w-full" required /></div>
                         <div><x-input-label for="date" :value="__('DATE')" /><x-text-input id="date" name="date" type="date" class="block w-full" value="{{ date('Y-m-d') }}" required /></div>
                     </div>
-                    <div><x-input-label for="category_id" :value="__('CATÉGORIE')" /><select name="category_id" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold">@foreach($categories as $category)<option value="{{ $category->id }}">{{ $category->name }}</option>@endforeach</select></div>
+                    <div><x-input-label for="category_id" :value="__('CATeGORIE')" /><select name="category_id" class="block w-full bg-slate-900/50 border-white/10 rounded-2xl text-slate-300 font-bold">@foreach($categories as $category)<option value="{{ $category->id }}">{{ $category->name }}</option>@endforeach</select></div>
                     <div class="pt-4"><x-primary-button class="w-full py-4 uppercase font-black">ENREGISTRER</x-primary-button></div>
                 </form>
             </div>

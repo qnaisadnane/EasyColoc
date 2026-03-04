@@ -22,8 +22,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4" />
                             </svg>
                         </div>
-                        <h3 class="text-3xl font-black text-white tracking-tight">Démarrer une colocation</h3>
-                        <p class="text-slate-400 mt-2 font-medium">Donnez un nom unique à votre espace de vie partagé.</p>
+                        <h3 class="text-3xl font-black text-white tracking-tight">Demarrer une colocation</h3>
+                        <p class="text-slate-400 mt-2 font-medium">Donnez un nom unique a votre espace de vie partage.</p>
                     </div>
 
                     <form method="POST" action="{{ route('colocations.store') }}" class="space-y-8">
@@ -40,7 +40,7 @@
                                 ← ANNULER
                             </a>
                             <x-primary-button class="w-full sm:w-auto px-12 py-5 text-lg">
-                                {{ __('LANCER LA COLO') }}
+                                {{ __('LANCER LA COLOCATION') }}
                             </x-primary-button>
                         </div>
                     </form>
