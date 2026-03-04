@@ -109,7 +109,7 @@ class ColocationController extends Controller
 
         // Calculer les balances basees sur la presence EFFECTIVE lors de chaque depense
         $balances = $historicalMembers->map(function ($memberPeriods) use ($expenses, $colocation) {
-            $member = $memberPeriods->first(); // On prend l'objet user de base
+            $member = $memberPeriods->first(); 
             $totalPaid = $expenses->where('user_id', $member->id)->sum('amount');
             $totalDebtShare = 0;
 

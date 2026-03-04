@@ -61,50 +61,41 @@
 
         <!-- Main Hero -->
         <main class="relative z-10 pt-20 pb-40 px-8">
-            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-                <div class="space-y-10">
-                    <div class="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                        <span class="flex h-2 w-2 rounded-full bg-indigo-500 animate-ping"></span>
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Nouveau : Gestion des balances</span>
-                    </div>
-
-                    <h1 class="text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter text-white">
-                        Vivez à plusieurs, <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-fuchsia-400 neon-text-indigo">sans le stress.</span>
-                    </h1>
-
-                    <p class="text-xl text-slate-400 max-w-xl font-medium leading-relaxed">
-                        EasyColoc centralise vos depenses dans une interface crystal-clear. equilibrez les comptes instantanement.
-                    </p>
-
-                    <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 pt-6">
-                        <a href="{{ route('register') }}" class="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(99,102,241,0.5)] active:scale-95 uppercase tracking-widest text-sm">
-                            Creer ma coloc
-                        </a>
-                        <a href="#features" class="w-full sm:w-auto px-10 py-5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black rounded-2xl transition-all active:scale-95 uppercase tracking-widest text-sm">
-                            Voir les fonctionnalites
-                        </a>
-                    </div>
-
-                    <div class="pt-10 flex items-center space-x-8">
-                        <div class="flex -space-x-3">
-                            @for($i=1; $i<=4; $i++)
-                                <div class="h-10 w-10 rounded-full border-2 border-[#020617] bg-slate-800 flex items-center justify-center text-[10px] font-bold">
-                                    {{ chr(64 + $i) }}
-                                </div>
-                            @endfor
-                        </div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                            Rejoint par <span class="text-white">+2000 colocations</span> en France
-                        </p>
-                    </div>
+            <div class="max-w-4xl mx-auto text-center space-y-10">
+                <div class="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+                    <span class="flex h-2 w-2 rounded-full bg-indigo-500 animate-ping"></span>
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Nouveau : Gestion des balances</span>
                 </div>
 
-                <div class="relative group">
-                    <div class="absolute -inset-10 bg-gradient-to-tr from-indigo-500/20 to-fuchsia-500/20 blur-[80px] rounded-[5rem] group-hover:opacity-100 transition-opacity duration-700 opacity-60"></div>
-                    <div class="relative glass-card aspect-square rounded-[4rem] overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center">
-                         <img src="/easy_coloc_hero_preview_1772185825007.png" alt="EasyColoc Preview" class="w-full h-full object-cover">
+                <h1 class="text-7xl lg:text-9xl font-black leading-[0.9] tracking-tighter text-white">
+                    Vivez à plusieurs, <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-fuchsia-400 neon-text-indigo">sans le stress.</span>
+                </h1>
+
+                <p class="text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                    EasyColoc centralise vos dépenses dans une interface crystal-clear. Équilibrez les comptes instantanément.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 pt-6">
+                    <a href="{{ route('register') }}" class="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(99,102,241,0.5)] active:scale-95 uppercase tracking-widest text-sm">
+                        Créer ma coloc
+                    </a>
+                    <a href="#features" class="w-full sm:w-auto px-10 py-5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black rounded-2xl transition-all active:scale-95 uppercase tracking-widest text-sm">
+                        Voir les fonctionnalités
+                    </a>
+                </div>
+
+                <div class="pt-10 flex items-center justify-center space-x-8">
+                    <div class="flex -space-x-3">
+                        @for($i=1; $i<=4; $i++)
+                            <div class="h-10 w-10 rounded-full border-2 border-[#020617] bg-slate-800 flex items-center justify-center text-[10px] font-bold">
+                                {{ chr(64 + $i) }}
+                            </div>
+                        @endfor
                     </div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                        Rejoint par <span class="text-white">+2000 colocations</span> en France
+                    </p>
                 </div>
             </div>
         </main>
@@ -120,13 +111,35 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
                     <!-- Feature 1 -->
                     <div class="glass-card p-10 rounded-[3rem] hover:translate-y-[-10px] transition-all duration-500">
+                        <div class="h-14 w-14 rounded-2xl bg-fuchsia-600/20 flex items-center justify-center text-fuchsia-400 mb-8 border border-fuchsia-500/30">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-2xl font-black text-white mb-4 uppercase tracking-tight">Gestion d'Équipe</h4>
+                        <p class="text-slate-500 font-medium">Gérez vos colocataires, les invitations et les rôles en toute simplicité.</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="glass-card p-10 rounded-[3rem] hover:translate-y-[-10px] transition-all duration-500">
+                        <div class="h-14 w-14 rounded-2xl bg-blue-600/20 flex items-center justify-center text-blue-400 mb-8 border border-blue-500/30">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-2xl font-black text-white mb-4 uppercase tracking-tight">Rapidité & Fluidité</h4>
+                        <p class="text-slate-500 font-medium">Une interface pensée pour le mobile, ultra-rapide pour saisir vos dépenses en un clin d'œil.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="glass-card p-10 rounded-[3rem] hover:translate-y-[-10px] transition-all duration-500">
                         <div class="h-14 w-14 rounded-2xl bg-indigo-600/20 flex items-center justify-center text-indigo-400 mb-8 border border-indigo-500/30">
                             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <h4 class="text-2xl font-black text-white mb-4 uppercase tracking-tight">Comptes Justes</h4>
-                        <p class="text-slate-500 font-medium">Fini les calculs interminables. Saisissez vos depenses et laissez EasyColoc equilibrer les balances en temps reel.</p>
+                        <p class="text-slate-500 font-medium">Fini les calculs interminables. Saisissez vos dépenses et laissez EasyColoc équilibrer les balances en temps réel.</p>
                     </div>
 
                 </div>
